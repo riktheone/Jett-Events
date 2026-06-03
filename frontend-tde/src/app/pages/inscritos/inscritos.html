@@ -1,0 +1,56 @@
+<div class="main-content page">
+  <div class="page-top">
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Admin</p>
+    <h2>Inscritos</h2>
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+
+  <p class="section-title">Por Evento</p>
+  @for (ev of eventos(); track ev.id) {
+    @if (ev.inscritos.length > 0) {
+      <div class="item-card">
+        <div class="item-header">
+          <span class="item-title">{{ ev.nome }}</span>
+          <span class="tag-vagas">{{ ev.inscritos.length }} inscrito(s)</span>
+        </div>
+        @for (ins of ev.inscritos; track $index) {
+          <div class="inscrito-row">
+            <span class="inscrito-num">{{ $index + 1 }}</span>
+            <div class="inscrito-info">
+              <strong>{{ ins.nome ?? ins }}</strong>
+              @if (ins.cpf) { <small>{{ ins.cpf }} · {{ ins.email }}</small> }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+  @if (eventos().length === 0) {
+    <div class="alert alert-info">Nenhum evento com inscritos.</div>
+  }
+
+  <p class="section-title">Por Minicurso</p>
+  @for (mc of minicursos(); track mc.id) {
+    @if (mc._inscritos.length > 0) {
+      <div class="item-card">
+        <div class="item-header">
+          <span class="item-title">{{ mc.nome }}</span>
+          <span class="tag-vagas">{{ mc._inscritos.length }} inscrito(s)</span>
+        </div>
+        @for (ins of mc._inscritos; track $index) {
+          <div class="inscrito-row">
+            <span class="inscrito-num">{{ $index + 1 }}</span>
+            <div class="inscrito-info">
+              <strong>{{ ins.nome ?? ins }}</strong>
+              @if (ins.cpf) { <small>{{ ins.cpf }} · {{ ins.email }}</small> }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+  @if (minicursos().length === 0) {
+    <div class="alert alert-info">Nenhum minicurso com inscritos.</div>
+  }
+</div>

@@ -1,0 +1,82 @@
+/* =============================================
+   PAGES.CSS — Estilos específicos de cada página
+============================================= */
+
+/* =============================================
+   DASHBOARD
+============================================= */
+.dash-header { margin-bottom: 28px; }
+.dash-header h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; margin-bottom: 4px; }
+.dash-header p  { color: var(--texto-fraco); }
+
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+
+.action-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: var(--radius); padding: 26px 18px;
+  cursor: pointer; transition: all .2s; text-align: center;
+}
+.action-card:hover {
+  background: var(--card-hover); border-color: var(--primaria);
+  transform: translateY(-3px); box-shadow: 0 8px 24px rgba(201,169,110,.1);
+}
+.action-card-disabled       { opacity: .38; cursor: default; }
+.action-card-disabled:hover { transform: none; border-color: var(--borda); box-shadow: none; }
+.action-card-admin          { border-color: rgba(155,109,224,.35); }
+.action-card-admin:hover    { border-color: var(--admin); box-shadow: 0 8px 24px rgba(155,109,224,.15); }
+.action-icon   { font-size: 1.9rem; margin-bottom: 10px; }
+.action-card h3 { font-size: .97rem; margin-bottom: 4px; }
+.action-card p  { font-size: .78rem; color: var(--texto-fraco); }
+
+/* =============================================
+   PERFIL
+============================================= */
+.perfil-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 24px; padding-bottom: 22px;
+  border-bottom: 1px solid var(--borda);
+}
+.perfil-header h3 { font-size: 1.05rem; margin-bottom: 5px; }
+
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--borda); }
+.info-row:last-of-type { border-bottom: none; margin-bottom: 18px; }
+.info-label { font-size: .78rem; color: var(--texto-fraco); text-transform: uppercase; letter-spacing: .05em; }
+.info-value { font-weight: 500; }
+
+/* =============================================
+   GERENCIAR USUÁRIOS (Admin)
+============================================= */
+.usuario-row    { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.usuario-info   { display: flex; align-items: center; gap: 12px; flex: 1; }
+.usuario-info > div { display: flex; flex-direction: column; gap: 3px; }
+.usuario-info strong { font-size: .93rem; }
+.usuario-info small  { font-size: .77rem; color: var(--texto-fraco); }
+.usuario-acoes  { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* =============================================
+   EVENTOS / PALESTRAS / MINICURSOS / PROGRAMAÇÃO
+============================================= */
+.item-card { background: var(--card); border: 1px solid var(--borda); border-radius: var(--radius); padding: 22px 26px; margin-bottom: 14px; }
+.item-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.item-title  { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--primaria); }
+.item-meta   { font-size: .8rem; color: var(--texto-fraco); display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.item-desc   { font-size: .88rem; color: var(--texto-fraco); margin-bottom: 12px; line-height: 1.5; }
+.item-acoes  { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* =============================================
+   INSCRITOS (Admin)
+============================================= */
+.inscrito-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--borda); }
+.inscrito-row:last-child { border-bottom: none; }
+.inscrito-num  { font-size: .8rem; color: var(--texto-fraco); min-width: 22px; }
+.inscrito-info { flex: 1; }
+.inscrito-info strong { font-size: .93rem; display: block; }
+.inscrito-info small  { font-size: .77rem; color: var(--texto-fraco); }
+
+/* =============================================
+   Responsivo (páginas)
+============================================= */
+@media(max-width:480px) {
+  .usuario-row      { flex-direction: column; align-items: flex-start; }
+  .page-top-actions { flex-direction: column; align-items: flex-start; }
+}

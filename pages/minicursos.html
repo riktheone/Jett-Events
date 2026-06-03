@@ -1,0 +1,115 @@
+<!-- =============================================
+     PÁGINA: Listagem de Minicursos
+     ng-show="tela === 'minicursos'"
+============================================= -->
+<section class="page" ng-show="tela === 'minicursos'">
+  <div class="page-top-actions">
+    <div>
+      <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+      <h2>Minicursos <span class="accent">Disponíveis</span></h2>
+    </div>
+    <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novoMinicurso')">+ Novo Minicurso</button>
+  </div>
+  <div ng-if="listaMinicursos.length === 0" class="alert alert-info">Nenhum minicurso cadastrado ainda.</div>
+  <div class="item-card" ng-repeat="mc in listaMinicursos">
+    <div class="item-header">
+      <span class="item-title">{{ mc.nome }}</span>
+      <span class="tag tag-vagas">{{ vagasRestantesMinicurso(mc) }} vagas</span>
+    </div>
+    <div class="item-meta">
+      <span>👨‍🏫 {{ mc.nome_instrutor }}</span>
+      <span>📅 {{ mc.dt_minicurso | date:'dd/MM/yyyy' }}</span>
+      <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
+      <span>⏰ Inscrições até: {{ mc.dt_limite_inscricao | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="item-desc">{{ mc.descricao }}</div>
+    <div ng-if="mc.minicurriculo_instrutor" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+      <strong>Sobre o instrutor:</strong> {{ mc.minicurriculo_instrutor }}
+    </div>
+    <div class="item-meta" ng-if="mc.id_evento">
+      <span>🎫 Evento: <strong>{{ getNomeEvento(mc.id_evento) }}</strong></span>
+    </div>
+    <div class="item-acoes">
+      <button class="btn btn-sm btn-success"
+        ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) > 0"
+        ng-click="inscreverMinicurso(mc)">✅ Inscrever-se</button>
+      <button class="btn btn-sm btn-danger"
+        ng-if="estaInscritoMinicurso(mc)"
+        ng-click="cancelarInscricaoMinicurso(mc)">❌ Cancelar inscrição</button>
+      <span class="tag tag-ativo"   ng-if="estaInscritoMinicurso(mc)">Inscrito</span>
+      <span class="tag tag-inativo" ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) <= 0">Vagas esgotadas</span>
+      <button class="btn btn-sm btn-ghost"  ng-if="me.administrador" ng-click="editarMinicurso(mc)">✏️ Editar</button>
+      <button class="btn btn-sm btn-danger" ng-if="me.administrador" ng-click="removerMinicurso(mc)">🗑 Remover</button>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     PÁGINA: Cadastro / Edição de Minicurso
+     ng-show="tela === 'novoMinicurso'"
+============================================= -->
+<section class="page" ng-show="tela === 'novoMinicurso'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('minicursos')">← Voltar</button>
+    <h2>{{ editandoMinicurso ? 'Editar' : 'Cadastrar' }} <span class="accent">Minicurso</span></h2>
+  </div>
+  <div class="card">
+    <form ng-submit="salvarMinicurso()" novalidate>
+      <div class="form-group">
+        <label>Título do minicurso</label>
+        <input type="text" ng-model="mcf.nome" placeholder="Ex: Introdução ao Python">
+      </div>
+      <div class="form-group">
+        <label>Nome do instrutor</label>
+        <input type="text" ng-model="mcf.nome_instrutor" placeholder="Nome do instrutor">
+      </div>
+      <div class="form-group">
+        <label>Minicurrículo do instrutor</label>
+        <textarea ng-model="mcf.minicurriculo_instrutor" placeholder="Breve currículo do instrutor..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea ng-model="mcf.descricao" placeholder="Conteúdo e objetivos do minicurso..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data do minicurso</label>
+          <input type="date" ng-model="mcf.dt_minicurso">
+        </div>
+        <div class="form-group">
+          <label>Data limite de inscrição</label>
+          <input type="date" ng-model="mcf.dt_limite_inscricao">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Horário de início</label>
+          <input type="time" ng-model="mcf.horario_inicio_minicurso">
+        </div>
+        <div class="form-group">
+          <label>Horário de fim</label>
+          <input type="time" ng-model="mcf.horario_fim_minicurso">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Número de vagas</label>
+          <input type="number" ng-model="mcf.numero_vagas" placeholder="30" min="1">
+        </div>
+        <div class="form-group">
+          <label>Vincular a Evento <span class="field-hint">(opcional)</span></label>
+          <select ng-model="mcf.id_evento">
+            <option value="">— Nenhum —</option>
+            <option ng-repeat="ev in listaEventos" ng-value="ev.id">{{ ev.nome }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert alert-error"   ng-show="mcErro">{{ mcErro }}</div>
+      <div class="alert alert-success" ng-show="mcOk">{{ mcOk }}</div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ editandoMinicurso ? 'Salvar alterações' : 'Cadastrar minicurso' }}</button>
+        <button type="button" class="btn btn-ghost" ng-click="ir('minicursos')">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</section>

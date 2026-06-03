@@ -1,0 +1,42 @@
+<div class="main-content page">
+  <div class="dash-header">
+    <h2>Olá, <span class="accent">{{ auth.usuario()!.nome.split(' ')[0] }}</span></h2>
+    <p>Bem-vindo ao sistema de gerenciamento de eventos.</p>
+  </div>
+
+  <p class="section-title">Navegação rápida</p>
+  <div class="cards-grid">
+    <a routerLink="/eventos" class="action-card">
+      <div class="action-icon">📅</div>
+      <h3>Eventos</h3>
+      <p>Ver e se inscrever</p>
+    </a>
+    <a routerLink="/palestras" class="action-card">
+      <div class="action-icon">🎙️</div>
+      <h3>Palestras</h3>
+      <p>Conferir programação</p>
+    </a>
+    <a routerLink="/minicursos" class="action-card">
+      <div class="action-icon">📚</div>
+      <h3>Minicursos</h3>
+      <p>Ver e se inscrever</p>
+    </a>
+    <a routerLink="/perfil" class="action-card">
+      <div class="action-icon">👤</div>
+      <h3>Perfil</h3>
+      <p>Editar dados</p>
+    </a>
+    @if (auth.isAdmin()) {
+      <a routerLink="/usuarios" class="action-card action-card-admin">
+        <div class="action-icon">👥</div>
+        <h3>Usuários</h3>
+        <p>Gerenciar</p>
+      </a>
+      <a routerLink="/inscritos" class="action-card action-card-admin">
+        <div class="action-icon">📋</div>
+        <h3>Inscritos</h3>
+        <p>Ver por evento</p>
+      </a>
+    }
+  </div>
+</div>

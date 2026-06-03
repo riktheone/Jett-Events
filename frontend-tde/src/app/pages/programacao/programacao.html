@@ -1,0 +1,58 @@
+<div class="main-content page">
+  <a routerLink="/eventos" class="btn-back">← Voltar aos eventos</a>
+  <div class="page-top">
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Programação</p>
+    <h2>{{ nomeEvento() || 'Evento' }}</h2>
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+  @if (carregando()) { <div class="alert alert-info">Carregando...</div> }
+
+  <p class="section-title">Palestras</p>
+  @for (p of palestras(); track p.id) {
+    <div class="item-card">
+      <div class="item-header">
+        <span class="item-title">{{ p.nome }}</span>
+      </div>
+      <div class="item-meta">
+        <span>📅 {{ p.dt_palestra }}</span>
+        <span>🕐 {{ p.horario_inicio_palestra }} – {{ p.horario_fim_palestra }}</span>
+        <span>🎙️ {{ p.nome_palestrante }}</span>
+      </div>
+      @if (p.descricao) { <p class="item-desc">{{ p.descricao }}</p> }
+      @if (p.minicurriculo_palestrante) {
+        <p class="item-desc" style="font-style:italic;">{{ p.minicurriculo_palestrante }}</p>
+      }
+    </div>
+  }
+  @if (palestras().length === 0 && !carregando()) {
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Nenhuma palestra neste evento.</p>
+  }
+
+  <p class="section-title">Minicursos</p>
+  @for (mc of minicursos(); track mc.id) {
+    <div class="item-card">
+      <div class="item-header">
+        <span class="item-title">{{ mc.nome }}</span>
+        <span class="tag-vagas">{{ mc.numero_vagas }} vagas</span>
+      </div>
+      <div class="item-meta">
+        <span>📅 {{ mc.dt_minicurso }}</span>
+        <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
+        <span>📚 {{ mc.nome_instrutor }}</span>
+        <span>⏰ Inscrições até {{ mc.dt_limite_inscricao }}</span>
+      </div>
+      @if (mc.descricao) { <p class="item-desc">{{ mc.descricao }}</p> }
+      <div class="item-acoes">
+        @if (estaInscrito(mc)) {
+          <button class="btn btn-ghost btn-sm" (click)="cancelarMinicurso(mc)">Cancelar inscrição</button>
+        } @else {
+          <button class="btn btn-success btn-sm" (click)="inscreverMinicurso(mc)">Inscrever-se</button>
+        }
+      </div>
+    </div>
+  }
+  @if (minicursos().length === 0 && !carregando()) {
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Nenhum minicurso neste evento.</p>
+  }
+</div>

@@ -1,0 +1,67 @@
+<!-- =============================================
+     PÁGINA: Programação do Evento
+     ng-show="tela === 'programacao'"
+============================================= -->
+<section class="page" ng-show="tela === 'programacao'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('eventos')">← Voltar</button>
+    <h2>Programação — <span class="accent">{{ eventoSelecionado.nome }}</span></h2>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="item-meta">
+      <span>📅 Início: {{ eventoSelecionado.dt_inicio | date:'dd/MM/yyyy' }}</span>
+      <span>🏁 Fim: {{ eventoSelecionado.dt_fim | date:'dd/MM/yyyy' }}</span>
+      <span>👤 {{ eventoSelecionado.nome_responsavel }}</span>
+    </div>
+    <div class="item-desc" style="margin-top:8px;margin-bottom:0">{{ eventoSelecionado.descricao }}</div>
+  </div>
+
+  <!-- Palestras do evento -->
+  <h3 class="section-title">🎤 Palestras</h3>
+  <div class="alert alert-info" ng-if="programacaoPalestras.length === 0">Nenhuma palestra cadastrada para este evento.</div>
+  <div class="item-card" ng-repeat="pl in programacaoPalestras">
+    <div class="item-header">
+      <span class="item-title">{{ pl.nome }}</span>
+    </div>
+    <div class="item-meta">
+      <span>📅 {{ pl.dt_palestra | date:'dd/MM/yyyy' }}</span>
+      <span>🕐 {{ pl.horario_inicio_palestra }} – {{ pl.horario_fim_palestra }}</span>
+      <span>🎤 {{ pl.nome_palestrante }}</span>
+    </div>
+    <div class="item-desc">{{ pl.descricao }}</div>
+    <div ng-if="pl.minicurriculo_palestrante" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+      <strong>Sobre o palestrante:</strong> {{ pl.minicurriculo_palestrante }}
+    </div>
+  </div>
+
+  <!-- Minicursos do evento -->
+  <h3 class="section-title">📚 Minicursos</h3>
+  <div class="alert alert-info" ng-if="programacaoMinicursos.length === 0">Nenhum minicurso cadastrado para este evento.</div>
+  <div class="item-card" ng-repeat="mc in programacaoMinicursos">
+    <div class="item-header">
+      <span class="item-title">{{ mc.nome }}</span>
+      <span class="tag tag-vagas">{{ vagasRestantesMinicurso(mc) }} vagas</span>
+    </div>
+    <div class="item-meta">
+      <span>📅 {{ mc.dt_minicurso | date:'dd/MM/yyyy' }}</span>
+      <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
+      <span>👨‍🏫 {{ mc.nome_instrutor }}</span>
+      <span>⏰ Inscrições até: {{ mc.dt_limite_inscricao | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="item-desc">{{ mc.descricao }}</div>
+    <div ng-if="mc.minicurriculo_instrutor" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+      <strong>Sobre o instrutor:</strong> {{ mc.minicurriculo_instrutor }}
+    </div>
+    <div class="item-acoes">
+      <button class="btn btn-sm btn-success"
+        ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) > 0"
+        ng-click="inscreverMinicurso(mc)">✅ Inscrever-se</button>
+      <button class="btn btn-sm btn-danger"
+        ng-if="estaInscritoMinicurso(mc)"
+        ng-click="cancelarInscricaoMinicurso(mc)">❌ Cancelar inscrição</button>
+      <span class="tag tag-ativo"   ng-if="estaInscritoMinicurso(mc)">Inscrito</span>
+      <span class="tag tag-inativo" ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) <= 0">Vagas esgotadas</span>
+    </div>
+  </div>
+</section>

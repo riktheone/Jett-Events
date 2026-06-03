@@ -1,0 +1,60 @@
+<div class="main-content page">
+  <a routerLink="/palestras" class="btn-back">← Voltar</a>
+  <div class="page-top">
+    <h2>{{ editando() ? 'Editar Palestra' : 'Nova Palestra' }}</h2>
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+  @if (ok()) { <div class="alert alert-success">{{ ok() }}</div> }
+
+  <div class="card">
+    <div class="form-group">
+      <label>Evento</label>
+      <select [(ngModel)]="id_evento">
+        <option [value]="0">— Selecione —</option>
+        @for (ev of eventos(); track ev.id) {
+          <option [value]="ev.id">{{ ev.nome }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Título da palestra *</label>
+      <input type="text" [(ngModel)]="nome" placeholder="Título">
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea [(ngModel)]="descricao" placeholder="Descrição"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data *</label>
+        <input type="date" [(ngModel)]="dt_palestra">
+      </div>
+      <div class="form-group"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Horário início *</label>
+        <input type="time" [(ngModel)]="horario_inicio_palestra">
+      </div>
+      <div class="form-group">
+        <label>Horário fim *</label>
+        <input type="time" [(ngModel)]="horario_fim_palestra">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Nome do palestrante *</label>
+      <input type="text" [(ngModel)]="nome_palestrante">
+    </div>
+    <div class="form-group">
+      <label>Mini currículo</label>
+      <textarea [(ngModel)]="minicurriculo_palestrante" placeholder="Breve descrição do palestrante"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="salvar()" [disabled]="carregando()">
+        {{ carregando() ? 'Salvando...' : 'Salvar' }}
+      </button>
+      <a routerLink="/palestras" class="btn btn-ghost">Cancelar</a>
+    </div>
+  </div>
+</div>

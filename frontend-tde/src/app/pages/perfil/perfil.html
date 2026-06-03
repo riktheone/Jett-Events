@@ -1,0 +1,60 @@
+<div class="main-content page">
+  <div class="page-top">
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Minha conta</p>
+    <h2>Perfil</h2>
+  </div>
+
+  @if (ok()) { <div class="alert alert-success">{{ ok() }}</div> }
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+
+  <div class="card">
+    <div class="perfil-header">
+      <div class="avatar">{{ auth.usuario()!.nome.charAt(0).toUpperCase() }}</div>
+      <div>
+        <h3>{{ auth.usuario()!.nome }}</h3>
+        @if (auth.isAdmin()) {
+          <span class="badge badge-admin">Administrador</span>
+        } @else {
+          <span class="badge badge-user">Usuário</span>
+        }
+      </div>
+    </div>
+
+    @if (!editando()) {
+      <div class="info-row">
+        <span class="info-label">Nome</span>
+        <span class="info-value">{{ auth.usuario()!.nome }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">CPF</span>
+        <span class="info-value">{{ auth.usuario()!.cpf }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">E-mail</span>
+        <span class="info-value">{{ auth.usuario()!.email }}</span>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-outline btn-sm" (click)="startEdit()">Editar dados</button>
+      </div>
+    } @else {
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" [(ngModel)]="nome">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" [(ngModel)]="email">
+      </div>
+      <div class="form-group">
+        <label>Nova senha <span style="color:var(--texto-fraco);text-transform:none;">(deixe em branco para não alterar)</span></label>
+        <input type="password" [(ngModel)]="novaSenha" placeholder="Nova senha">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary btn-sm" (click)="salvar()" [disabled]="carregando()">
+          {{ carregando() ? 'Salvando...' : 'Salvar' }}
+        </button>
+        <button class="btn btn-ghost btn-sm" (click)="cancelEdit()">Cancelar</button>
+      </div>
+    }
+  </div>
+</div>

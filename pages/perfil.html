@@ -1,0 +1,55 @@
+<!-- =============================================
+     PÁGINA: Meu Perfil
+     ng-show="tela === 'perfil'"
+============================================= -->
+<section class="page" ng-show="tela === 'perfil'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+    <h2>Meu <span class="accent">Perfil</span></h2>
+  </div>
+  <div class="card">
+    <div class="perfil-header">
+      <div class="avatar">{{ me.nome | ini }}</div>
+      <div>
+        <h3>{{ me.nome }}</h3>
+        <span class="badge" ng-class="me.administrador?'badge-admin':'badge-user'">{{ me.tipo }}</span>
+      </div>
+    </div>
+
+    <!-- Modo visualização -->
+    <div ng-hide="editando">
+      <div class="info-row"><span class="info-label">CPF</span><span class="info-value">{{ me.cpf }}</span></div>
+      <div class="info-row"><span class="info-label">E-mail</span><span class="info-value">{{ me.email }}</span></div>
+      <div class="info-row"><span class="info-label">Nome</span><span class="info-value">{{ me.nome }}</span></div>
+      <div class="info-row"><span class="info-label">Tipo de Conta</span><span class="info-value">{{ me.tipo }}</span></div>
+      <div class="form-actions">
+        <button class="btn btn-primary" ng-click="startEdit()">Editar dados</button>
+        <button class="btn btn-ghost"   ng-click="ir('redefinirSenha')">Redefinir Senha</button>
+      </div>
+    </div>
+
+    <!-- Modo edição -->
+    <div ng-show="editando">
+      <form ng-submit="saveEdit()" novalidate>
+        <div class="form-group">
+          <label>CPF <span class="field-hint">(não pode ser alterado)</span></label>
+          <input type="text" ng-value="me.cpf" disabled class="input-disabled">
+        </div>
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" ng-model="ef.nome">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" ng-model="ef.email">
+        </div>
+        <div class="alert alert-error"   ng-show="eErro">{{ eErro }}</div>
+        <div class="alert alert-success" ng-show="eOk">{{ eOk }}</div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Salvar</button>
+          <button type="button" class="btn btn-ghost" ng-click="cancelEdit()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

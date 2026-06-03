@@ -1,0 +1,44 @@
+<div class="main-content page">
+  <div class="page-top-actions">
+    <div>
+      <p style="color:var(--texto-fraco);font-size:.88rem;">Listagem</p>
+      <h2>Minicursos</h2>
+    </div>
+    @if (auth.isAdmin()) {
+      <a routerLink="/minicursos/novo" class="btn btn-primary btn-sm">+ Novo minicurso</a>
+    }
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+
+  @for (mc of lista(); track mc.id) {
+    <div class="item-card">
+      <div class="item-header">
+        <span class="item-title">{{ mc.nome }}</span>
+        <span class="tag-vagas">{{ mc.numero_vagas }} vagas</span>
+      </div>
+      <div class="item-meta">
+        <span>📅 {{ mc.dt_minicurso }}</span>
+        <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
+        <span>📚 {{ mc.nome_instrutor }}</span>
+        <span>⏰ Inscrições até {{ mc.dt_limite_inscricao }}</span>
+        <span>🏷️ {{ nomeEvento(mc.id_evento) }}</span>
+      </div>
+      @if (mc.descricao) {
+        <p class="item-desc">{{ mc.descricao }}</p>
+      }
+      <div class="item-acoes">
+        <button class="btn btn-success btn-sm" (click)="inscrever(mc)">Inscrever-se</button>
+        <button class="btn btn-ghost btn-sm" (click)="cancelarInscricao(mc)">Cancelar inscrição</button>
+        @if (auth.isAdmin()) {
+          <a [routerLink]="['/minicursos', mc.id, 'editar']" class="btn btn-outline btn-sm">Editar</a>
+          <button class="btn btn-danger btn-sm" (click)="remover(mc)">Remover</button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (lista().length === 0 && !erro()) {
+    <div class="alert alert-info">Nenhum minicurso cadastrado.</div>
+  }
+</div>

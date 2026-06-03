@@ -1,0 +1,43 @@
+<div class="main-content page">
+  <div class="page-top-actions">
+    <div>
+      <p style="color:var(--texto-fraco);font-size:.88rem;">Admin</p>
+      <h2>Usuários</h2>
+    </div>
+    <a routerLink="/usuarios/novo" class="btn btn-primary btn-sm">+ Novo usuário</a>
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+
+  @for (u of lista(); track u.id) {
+    @if (u.id !== auth.usuario()!.id) {
+      <div class="card" style="padding:18px 24px;">
+        <div class="usuario-row">
+          <div class="usuario-info">
+            <div class="avatar avatar-sm">{{ u.nome.charAt(0).toUpperCase() }}</div>
+            <div>
+              <strong>{{ u.nome }}</strong>
+              <small>{{ u.cpf }} · {{ u.email }}</small>
+            </div>
+          </div>
+          <div class="usuario-acoes">
+            @if (u.administrador) {
+              <span class="badge badge-admin">Admin</span>
+            } @else {
+              <span class="badge badge-user">Comum</span>
+            }
+            <a [routerLink]="['/usuarios', u.id, 'editar']" class="btn btn-outline btn-sm">Editar</a>
+            @if (!u.administrador) {
+              <button class="btn btn-info btn-sm" (click)="promover(u)">Promover</button>
+            }
+            <button class="btn btn-danger btn-sm" (click)="remover(u)">Remover</button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  @if (outrosUsuarios().length === 0) {
+    <div class="alert alert-info">Nenhum outro usuário cadastrado.</div>
+  }
+</div>

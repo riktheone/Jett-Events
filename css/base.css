@@ -1,0 +1,95 @@
+/* =============================================
+   BASE.CSS — Variáveis, Reset, Body, Navbar, Layout
+============================================= */
+
+:root {
+  --fundo: #0f0f14;
+  --card: #1a1a24;
+  --card-hover: #22222f;
+  --borda: #2e2e40;
+  --primaria: #c9a96e;
+  --primaria-dark: #a8833e;
+  --acento: #e8c98a;
+  --texto: #e8e8f0;
+  --texto-fraco: #7a7a96;
+  --erro: #e05a6a;
+  --sucesso: #4caf82;
+  --info: #5a8ae0;
+  --admin: #9b6de0;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(201,169,110,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Navbar ---- */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(15,15,20,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--borda);
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--primaria);
+}
+.brand-icon { animation: pulse 3s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.nav-links { display: flex; align-items: center; gap: 14px; }
+.nav-user  { font-size: 0.88rem; color: var(--texto-fraco); }
+.nav-badge { background: var(--admin); color: #fff; font-size: 0.7rem; padding: 2px 9px; border-radius: 20px; font-weight: 500; }
+
+.btn-logout {
+  background: none; border: none; color: var(--texto-fraco);
+  cursor: pointer; font-size: 0.85rem;
+  font-family: 'DM Sans', sans-serif; transition: color .2s;
+}
+.btn-logout:hover { color: var(--erro); }
+
+/* ---- Layout principal ---- */
+.main-content {
+  max-width: 700px; margin: 0 auto;
+  padding: 40px 20px 80px;
+  position: relative; z-index: 1;
+}
+.page { animation: fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ---- Utilitários globais ---- */
+.accent { color: var(--primaria); }
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; color: var(--texto-fraco);
+  margin: 22px 0 10px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--borda);
+}
+
+/* ---- Responsivo ---- */
+@media(max-width:480px) {
+  .navbar       { padding: 14px 16px; }
+  .main-content { padding: 24px 14px 60px; }
+}

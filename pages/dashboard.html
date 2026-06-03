@@ -1,0 +1,42 @@
+<!-- =============================================
+     PÁGINA: Dashboard
+     ng-show="tela === 'dashboard'"
+============================================= -->
+<section class="page" ng-show="tela === 'dashboard'">
+  <div class="dash-header">
+    <h2>Painel <span class="accent">de Controle</span></h2>
+    <p>Bem-vindo ao Jett Events, {{ me.nome }}</p>
+  </div>
+  <div class="cards-grid">
+    <div class="action-card" ng-click="ir('perfil')">
+      <div class="action-icon">👤</div>
+      <h3>Meu Perfil</h3>
+      <p>Ver e editar seus dados</p>
+    </div>
+    <div class="action-card" ng-click="ir('eventos')">
+      <div class="action-icon">🎫</div>
+      <h3>Eventos</h3>
+      <p>Ver e se inscrever em eventos</p>
+    </div>
+    <div class="action-card" ng-click="ir('minicursos')">
+      <div class="action-icon">📚</div>
+      <h3>Minicursos</h3>
+      <p>Ver e se inscrever em minicursos</p>
+    </div>
+    <div class="action-card" ng-click="ir('palestras')">
+      <div class="action-icon">🎤</div>
+      <h3>Palestras</h3>
+      <p>Ver palestras disponíveis</p>
+    </div>
+    <div class="action-card action-card-admin" ng-if="me.administrador" ng-click="ir('usuarios')">
+      <div class="action-icon">⚙️</div>
+      <h3>Usuários</h3>
+      <p>Gerenciar usuários</p>
+    </div>
+    <div class="action-card action-card-admin" ng-if="me.administrador" ng-click="ir('inscritos')">
+      <div class="action-icon">📋</div>
+      <h3>Inscritos</h3>
+      <p>Ver usuários inscritos</p>
+    </div>
+  </div>
+</section>

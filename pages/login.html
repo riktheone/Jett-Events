@@ -1,0 +1,30 @@
+<!-- =============================================
+     PÁGINA: Login
+     ng-show="tela === 'login'"
+============================================= -->
+<section class="page" ng-show="tela === 'login'">
+  <div class="card card-auth">
+    <div class="card-header">
+      <h1>Jett Events</h1>
+      <p>Gerencie seus eventos com elegância</p>
+    </div>
+    <form ng-submit="login()" novalidate>
+      <div class="form-group">
+        <label>CPF</label>
+        <input type="text"
+               ng-model="lf.cpf"
+               placeholder="000.000.000-00"
+               maxlength="14"
+               ng-keyup="fmtCPFLogin()">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" ng-model="lf.senha" placeholder="••••••••">
+      </div>
+      <div class="alert alert-error" ng-show="lErro">{{ lErro }}</div>
+      <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+      <button type="button" class="btn btn-ghost btn-full" ng-click="ir('cadastro')">Não tem conta? Cadastre-se</button>
+      <button type="button" class="btn btn-ghost btn-full" ng-click="ir('redefinirSenha')">Esqueci minha senha</button>
+    </form>
+  </div>
+</section>

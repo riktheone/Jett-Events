@@ -1,0 +1,43 @@
+<div class="main-content page">
+  <div class="page-top-actions">
+    <div>
+      <p style="color:var(--texto-fraco);font-size:.88rem;">Listagem</p>
+      <h2>Palestras</h2>
+    </div>
+    @if (auth.isAdmin()) {
+      <a routerLink="/palestras/novo" class="btn btn-primary btn-sm">+ Nova palestra</a>
+    }
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+
+  @for (p of lista(); track p.id) {
+    <div class="item-card">
+      <div class="item-header">
+        <span class="item-title">{{ p.nome }}</span>
+        <span class="tag-vagas">{{ nomeEvento(p.id_evento) }}</span>
+      </div>
+      <div class="item-meta">
+        <span>📅 {{ p.dt_palestra }}</span>
+        <span>🕐 {{ p.horario_inicio_palestra }} – {{ p.horario_fim_palestra }}</span>
+        <span>🎙️ {{ p.nome_palestrante }}</span>
+      </div>
+      @if (p.descricao) {
+        <p class="item-desc">{{ p.descricao }}</p>
+      }
+      @if (p.minicurriculo_palestrante) {
+        <p class="item-desc" style="font-style:italic;">{{ p.minicurriculo_palestrante }}</p>
+      }
+      @if (auth.isAdmin()) {
+        <div class="item-acoes">
+          <a [routerLink]="['/palestras', p.id, 'editar']" class="btn btn-outline btn-sm">Editar</a>
+          <button class="btn btn-danger btn-sm" (click)="remover(p)">Remover</button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (lista().length === 0 && !erro()) {
+    <div class="alert alert-info">Nenhuma palestra cadastrada.</div>
+  }
+</div>

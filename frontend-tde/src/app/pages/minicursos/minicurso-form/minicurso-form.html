@@ -1,0 +1,70 @@
+<div class="main-content page">
+  <a routerLink="/minicursos" class="btn-back">← Voltar</a>
+  <div class="page-top">
+    <h2>{{ editando() ? 'Editar Minicurso' : 'Novo Minicurso' }}</h2>
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+  @if (ok()) { <div class="alert alert-success">{{ ok() }}</div> }
+
+  <div class="card">
+    <div class="form-group">
+      <label>Evento</label>
+      <select [(ngModel)]="id_evento">
+        <option [value]="0">— Selecione —</option>
+        @for (ev of eventos(); track ev.id) {
+          <option [value]="ev.id">{{ ev.nome }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Nome do minicurso *</label>
+      <input type="text" [(ngModel)]="nome" placeholder="Nome">
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <textarea [(ngModel)]="descricao" placeholder="Descrição"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data *</label>
+        <input type="date" [(ngModel)]="dt_minicurso">
+      </div>
+      <div class="form-group">
+        <label>Limite de inscrição *</label>
+        <input type="date" [(ngModel)]="dt_limite_inscricao">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Horário início *</label>
+        <input type="time" [(ngModel)]="horario_inicio_minicurso">
+      </div>
+      <div class="form-group">
+        <label>Horário fim *</label>
+        <input type="time" [(ngModel)]="horario_fim_minicurso">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Número de vagas *</label>
+        <input type="number" [(ngModel)]="numero_vagas" min="1">
+      </div>
+      <div class="form-group"></div>
+    </div>
+    <div class="form-group">
+      <label>Nome do instrutor *</label>
+      <input type="text" [(ngModel)]="nome_instrutor">
+    </div>
+    <div class="form-group">
+      <label>Mini currículo do instrutor</label>
+      <textarea [(ngModel)]="minicurriculo_instrutor" placeholder="Breve descrição"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="salvar()" [disabled]="carregando()">
+        {{ carregando() ? 'Salvando...' : 'Salvar' }}
+      </button>
+      <a routerLink="/minicursos" class="btn btn-ghost">Cancelar</a>
+    </div>
+  </div>
+</div>

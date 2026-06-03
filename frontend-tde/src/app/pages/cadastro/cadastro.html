@@ -1,0 +1,35 @@
+<div class="main-content page">
+  <div class="card card-auth">
+    <div class="card-header">
+      <h2>Criar Conta</h2>
+      <p>Preencha os dados para se cadastrar</p>
+    </div>
+
+    @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+    @if (ok()) { <div class="alert alert-success">{{ ok() }}</div> }
+
+    <div class="form-group">
+      <label>Nome completo</label>
+      <input type="text" [(ngModel)]="nome" placeholder="Seu nome">
+    </div>
+    <div class="form-group">
+      <label>CPF</label>
+      <input type="text" [value]="cpf" (input)="formatarCPF($event)" placeholder="000.000.000-00">
+    </div>
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" [(ngModel)]="email" placeholder="seu@email.com">
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" [(ngModel)]="senha" placeholder="Mínimo 6 caracteres">
+    </div>
+
+    <button class="btn btn-primary btn-full" (click)="cadastrar()" [disabled]="carregando()">
+      {{ carregando() ? 'Cadastrando...' : 'Cadastrar' }}
+    </button>
+    <a routerLink="/login" style="display:block;text-align:center;color:var(--texto-fraco);font-size:.88rem;margin-top:8px;">
+      Já tem conta? Entrar
+    </a>
+  </div>
+</div>

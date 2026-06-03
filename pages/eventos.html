@@ -1,0 +1,131 @@
+<!-- =============================================
+     PÁGINA: Listagem de Eventos
+     ng-show="tela === 'eventos'"
+============================================= -->
+<section class="page" ng-show="tela === 'eventos'">
+  <div class="page-top-actions">
+    <div>
+      <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+      <h2>Eventos <span class="accent">Disponíveis</span></h2>
+    </div>
+    <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novoEvento')">+ Novo Evento</button>
+  </div>
+
+  <!-- Filtro por período -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:.82rem;font-weight:500;color:var(--texto-fraco);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Filtrar por período</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group" style="margin-bottom:0">
+        <label>Data início</label>
+        <input type="date" ng-model="filtro.dt_inicio">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Data fim</label>
+        <input type="date" ng-model="filtro.dt_fim">
+      </div>
+    </div>
+    <div class="alert alert-error" ng-show="evErro" style="margin-bottom:8px">{{ evErro }}</div>
+    <div class="form-actions">
+      <button class="btn btn-primary btn-sm" ng-click="filtrarEventos()">🔍 Filtrar</button>
+      <button class="btn btn-ghost btn-sm" ng-show="filtrando" ng-click="limparFiltro()">✕ Limpar filtro</button>
+    </div>
+    <div class="alert alert-info" ng-show="filtrando" style="margin-top:10px;margin-bottom:0">
+      Exibindo eventos de {{ filtro.dt_inicio | date:'dd/MM/yyyy' }} até {{ filtro.dt_fim | date:'dd/MM/yyyy' }}.
+    </div>
+  </div>
+
+  <div ng-if="listaEventos.length === 0" class="alert alert-info">Nenhum evento encontrado.</div>
+  <div class="item-card" ng-repeat="ev in listaEventos">
+    <div class="item-header">
+      <span class="item-title">{{ ev.nome }}</span>
+      <span class="tag tag-vagas">{{ vagasRestantesEvento(ev) }} vagas</span>
+    </div>
+    <div class="item-meta">
+      <span>📅 Início: {{ ev.dt_inicio | date:'dd/MM/yyyy' }}</span>
+      <span>🏁 Fim: {{ ev.dt_fim | date:'dd/MM/yyyy' }}</span>
+      <span>⏰ Inscrições até: {{ ev.dt_limite_inscricao | date:'dd/MM/yyyy' }}</span>
+    </div>
+    <div class="item-meta">
+      <span>👤 {{ ev.nome_responsavel }}</span>
+      <span>📧 {{ ev.email_responsavel }}</span>
+    </div>
+    <div class="item-desc">{{ ev.descricao }}</div>
+    <div class="item-acoes">
+      <button class="btn btn-sm btn-success"
+        ng-if="!estaInscritoEvento(ev) && vagasRestantesEvento(ev) > 0"
+        ng-click="inscreverEvento(ev)">✅ Inscrever-se</button>
+      <button class="btn btn-sm btn-danger"
+        ng-if="estaInscritoEvento(ev)"
+        ng-click="cancelarInscricaoEvento(ev)">❌ Cancelar inscrição</button>
+      <span class="tag tag-ativo"   ng-if="estaInscritoEvento(ev)">Inscrito</span>
+      <span class="tag tag-inativo" ng-if="!estaInscritoEvento(ev) && vagasRestantesEvento(ev) <= 0">Vagas esgotadas</span>
+      <button class="btn btn-sm btn-info"   ng-click="verProgramacao(ev)">📋 Programação</button>
+      <button class="btn btn-sm btn-ghost"  ng-if="me.administrador" ng-click="editarEvento(ev)">✏️ Editar</button>
+      <button class="btn btn-sm btn-danger" ng-if="me.administrador" ng-click="removerEvento(ev)">🗑 Remover</button>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     PÁGINA: Cadastro / Edição de Evento
+     ng-show="tela === 'novoEvento'"
+============================================= -->
+<section class="page" ng-show="tela === 'novoEvento'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('eventos')">← Voltar</button>
+    <h2>{{ editandoEvento ? 'Editar' : 'Cadastrar' }} <span class="accent">Evento</span></h2>
+  </div>
+  <div class="card">
+    <form ng-submit="salvarEvento()" novalidate>
+      <div class="form-group">
+        <label>Nome do evento</label>
+        <input type="text" ng-model="evf.nome" placeholder="Ex: Semana de Tecnologia 2025">
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea ng-model="evf.descricao" placeholder="Descreva o evento..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data de início</label>
+          <input type="date" ng-model="evf.dt_inicio">
+        </div>
+        <div class="form-group">
+          <label>Data de fim</label>
+          <input type="date" ng-model="evf.dt_fim">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data limite de inscrição</label>
+          <input type="date" ng-model="evf.dt_limite_inscricao">
+        </div>
+        <div class="form-group">
+          <label>Número de vagas</label>
+          <input type="number" ng-model="evf.numero_vagas" placeholder="100" min="1">
+        </div>
+      </div>
+      <h3 class="section-title">Responsável pelo evento</h3>
+      <div class="form-group">
+        <label>Nome do responsável</label>
+        <input type="text" ng-model="evf.nome_responsavel" placeholder="Nome completo">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>CPF do responsável</label>
+          <input type="text" ng-model="evf.cpf_responsavel" placeholder="000.000.000-00" maxlength="14">
+        </div>
+        <div class="form-group">
+          <label>E-mail do responsável</label>
+          <input type="email" ng-model="evf.email_responsavel" placeholder="responsavel@email.com">
+        </div>
+      </div>
+      <div class="alert alert-error"   ng-show="evErro">{{ evErro }}</div>
+      <div class="alert alert-success" ng-show="evOk">{{ evOk }}</div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ editandoEvento ? 'Salvar alterações' : 'Cadastrar evento' }}</button>
+        <button type="button" class="btn btn-ghost" ng-click="ir('eventos')">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</section>

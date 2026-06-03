@@ -1,0 +1,54 @@
+<!-- =============================================
+     PÁGINA: Usuários Inscritos (Admin)
+     ng-show="tela === 'inscritos'"
+     Os dados vêm do backend via _inscritos
+     (carregados por carregarInscritosPorEvento/Minicurso)
+============================================= -->
+<section class="page" ng-show="tela === 'inscritos'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+    <h2>Usuários <span class="accent">Inscritos</span></h2>
+  </div>
+  <div class="alert alert-error" ng-if="!me.administrador">
+    Acesso negado. Apenas administradores podem visualizar esta área.
+  </div>
+  <div ng-if="me.administrador">
+
+    <h3 class="section-title">🎫 Inscrições em Eventos</h3>
+    <div ng-if="listaEventos.length === 0" class="alert alert-info">Nenhum evento cadastrado.</div>
+    <div class="card" ng-repeat="ev in listaEventos" ng-if="ev._inscritos && ev._inscritos.length > 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <strong style="font-size:.97rem">{{ ev.nome }}</strong>
+        <span class="tag tag-vagas">{{ ev._inscritos.length }} inscrito(s)</span>
+      </div>
+      <div class="inscrito-row" ng-repeat="p in ev._inscritos">
+        <span class="inscrito-num">{{ $index + 1 }}</span>
+        <div class="avatar avatar-sm">{{ p.nome | ini }}</div>
+        <div class="inscrito-info">
+          <strong>{{ p.nome }}</strong>
+          <small>{{ p.email }} · CPF: {{ p.cpf }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-info" ng-if="semInscritosEventos()">Nenhum usuário inscrito em eventos ainda.</div>
+
+    <h3 class="section-title">📚 Inscrições em Minicursos</h3>
+    <div ng-if="listaMinicursos.length === 0" class="alert alert-info">Nenhum minicurso cadastrado.</div>
+    <div class="card" ng-repeat="mc in listaMinicursos" ng-if="mc._inscritos && mc._inscritos.length > 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <strong style="font-size:.97rem">{{ mc.nome }}</strong>
+        <span class="tag tag-vagas">{{ mc._inscritos.length }} inscrito(s)</span>
+      </div>
+      <div class="inscrito-row" ng-repeat="p in mc._inscritos">
+        <span class="inscrito-num">{{ $index + 1 }}</span>
+        <div class="avatar avatar-sm">{{ p.nome | ini }}</div>
+        <div class="inscrito-info">
+          <strong>{{ p.nome }}</strong>
+          <small>{{ p.email }} · CPF: {{ p.cpf }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-info" ng-if="semInscritosMinicursos()">Nenhum usuário inscrito em minicursos ainda.</div>
+
+  </div>
+</section>

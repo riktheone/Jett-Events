@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node --version)",
+      "PowerShell(npm --version)",
+      "PowerShell(ng version 2>$null)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); node --version; npm --version)",
+      "Bash(python -c ' *)",
+      "Bash(python -c \"import sqlite3; conn=sqlite3.connect\\('./database/tde.db'\\); print\\([row for row in conn.execute\\('SELECT id, cpf, nome, email, usuario_admin FROM usuarios'\\)]\\); conn.close\\(\\)\")",
+      "Bash(python database/seed_usuario.py)",
+      "Bash(python database/seed_dados.py)"
+    ]
+  }
+}

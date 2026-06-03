@@ -1,0 +1,88 @@
+<!-- =============================================
+     PÁGINA: Gerenciar Usuários — Listagem (Admin)
+     ng-show="tela === 'usuarios'"
+============================================= -->
+<section class="page" ng-show="tela === 'usuarios'">
+  <div class="page-top-actions">
+    <div>
+      <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+      <h2>Gerenciar <span class="accent">Usuários</span></h2>
+    </div>
+    <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novoUsuario')">+ Novo Usuário</button>
+  </div>
+  <div class="alert alert-error" ng-if="!me.administrador">
+    Acesso negado. Apenas administradores podem acessar esta área.
+  </div>
+  <div ng-if="me.administrador">
+    <div class="card" ng-repeat="u in listaUsers" ng-if="u.id !== me.id">
+      <div class="usuario-row">
+        <div class="usuario-info">
+          <div class="avatar avatar-sm">{{ u.nome | ini }}</div>
+          <div>
+            <strong>{{ u.nome }}</strong>
+            <small>{{ u.email }} · CPF: {{ u.cpf }}</small>
+            <span class="badge" ng-class="u.administrador?'badge-admin':'badge-user'">{{ u.tipo }}</span>
+          </div>
+        </div>
+        <div class="usuario-acoes">
+          <button class="btn btn-sm btn-ghost"   ng-click="editarUsuario(u)">✏️ Editar</button>
+          <button class="btn btn-sm btn-outline"  ng-if="!u.administrador" ng-click="promover(u)">⬆ Promover</button>
+          <button class="btn btn-sm btn-ghost"    ng-if="u.administrador"  ng-click="rebaixar(u)">⬇ Rebaixar</button>
+          <button class="btn btn-sm btn-danger"   ng-click="remover(u)">🗑 Remover</button>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-info" ng-show="semOutros()">Nenhum outro usuário cadastrado.</div>
+  </div>
+</section>
+
+<!-- =============================================
+     PÁGINA: Cadastro / Edição de Usuário (Admin)
+     ng-show="tela === 'novoUsuario'"
+============================================= -->
+<section class="page" ng-show="tela === 'novoUsuario'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('usuarios')">← Voltar</button>
+    <h2>{{ editandoUsuario ? 'Editar' : 'Cadastrar' }} <span class="accent">Usuário</span></h2>
+  </div>
+  <div class="card">
+    <form ng-submit="salvarUsuario()" novalidate>
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" ng-model="uf.nome" placeholder="Nome do usuário">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" ng-model="uf.cpf" placeholder="000.000.000-00" maxlength="14"
+            ng-disabled="editandoUsuario" ng-class="editandoUsuario?'input-disabled':''">
+        </div>
+        <div class="form-group">
+          <label>Tipo de Conta</label>
+          <select ng-model="uf.tipo">
+            <option value="comum">Comum</option>
+            <option value="administrador">Administrador</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" ng-model="uf.email" placeholder="email@exemplo.com">
+      </div>
+      <div class="form-group" ng-if="!editandoUsuario">
+        <label>Senha <span class="field-hint">mínimo 6 caracteres</span></label>
+        <input type="password" ng-model="uf.senha" placeholder="••••••••">
+      </div>
+      <div class="form-group" ng-if="editandoUsuario">
+        <label>Nova senha <span class="field-hint">deixe vazio para manter a atual</span></label>
+        <input type="password" ng-model="uf.novaSenha" placeholder="••••••••">
+      </div>
+      <div class="alert alert-error"   ng-show="ufErro">{{ ufErro }}</div>
+      <div class="alert alert-success" ng-show="ufOk">{{ ufOk }}</div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ editandoUsuario ? 'Salvar alterações' : 'Cadastrar usuário' }}</button>
+        <button type="button" class="btn btn-ghost" ng-click="ir('usuarios')">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</section>

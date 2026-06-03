@@ -1,0 +1,95 @@
+<!-- =============================================
+     PÁGINA: Listagem de Palestras
+     ng-show="tela === 'palestras'"
+============================================= -->
+<section class="page" ng-show="tela === 'palestras'">
+  <div class="page-top-actions">
+    <div>
+      <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+      <h2>Palestras <span class="accent">Disponíveis</span></h2>
+    </div>
+    <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novaPalestra')">+ Nova Palestra</button>
+  </div>
+  <div ng-if="listaPalestras.length === 0" class="alert alert-info">Nenhuma palestra cadastrada ainda.</div>
+  <div class="item-card" ng-repeat="pl in listaPalestras">
+    <div class="item-header">
+      <span class="item-title">{{ pl.nome }}</span>
+    </div>
+    <div class="item-meta">
+      <span>🎤 {{ pl.nome_palestrante }}</span>
+      <span>📅 {{ pl.dt_palestra | date:'dd/MM/yyyy' }}</span>
+      <span>🕐 {{ pl.horario_inicio_palestra }} – {{ pl.horario_fim_palestra }}</span>
+    </div>
+    <div class="item-desc">{{ pl.descricao }}</div>
+    <div ng-if="pl.minicurriculo_palestrante" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+      <strong>Sobre o palestrante:</strong> {{ pl.minicurriculo_palestrante }}
+    </div>
+    <div class="item-meta" ng-if="pl.id_evento">
+      <span>🎫 Evento: <strong>{{ getNomeEvento(pl.id_evento) }}</strong></span>
+    </div>
+    <div class="item-acoes" ng-if="me.administrador">
+      <button class="btn btn-sm btn-ghost"  ng-click="editarPalestra(pl)">✏️ Editar</button>
+      <button class="btn btn-sm btn-danger" ng-click="removerPalestra(pl)">🗑 Remover</button>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     PÁGINA: Cadastro / Edição de Palestra
+     ng-show="tela === 'novaPalestra'"
+============================================= -->
+<section class="page" ng-show="tela === 'novaPalestra'">
+  <div class="page-top">
+    <button class="btn-back" ng-click="ir('palestras')">← Voltar</button>
+    <h2>{{ editandoPalestra ? 'Editar' : 'Cadastrar' }} <span class="accent">Palestra</span></h2>
+  </div>
+  <div class="card">
+    <form ng-submit="salvarPalestra()" novalidate>
+      <div class="form-group">
+        <label>Título da palestra</label>
+        <input type="text" ng-model="plf.nome" placeholder="Ex: Inteligência Artificial no Mercado">
+      </div>
+      <div class="form-group">
+        <label>Nome do palestrante</label>
+        <input type="text" ng-model="plf.nome_palestrante" placeholder="Nome do palestrante">
+      </div>
+      <div class="form-group">
+        <label>Minicurrículo do palestrante</label>
+        <textarea ng-model="plf.minicurriculo_palestrante" placeholder="Breve currículo do palestrante..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea ng-model="plf.descricao" placeholder="Sobre o que será a palestra..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data da palestra</label>
+          <input type="date" ng-model="plf.dt_palestra">
+        </div>
+        <div class="form-group">
+          <label>Horário de início</label>
+          <input type="time" ng-model="plf.horario_inicio_palestra">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Horário de fim</label>
+          <input type="time" ng-model="plf.horario_fim_palestra">
+        </div>
+        <div class="form-group">
+          <label>Vincular a Evento <span class="field-hint">(opcional)</span></label>
+          <select ng-model="plf.id_evento">
+            <option value="">— Nenhum —</option>
+            <option ng-repeat="ev in listaEventos" ng-value="ev.id">{{ ev.nome }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert alert-error"   ng-show="plErro">{{ plErro }}</div>
+      <div class="alert alert-success" ng-show="plOk">{{ plOk }}</div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ editandoPalestra ? 'Salvar alterações' : 'Cadastrar palestra' }}</button>
+        <button type="button" class="btn btn-ghost" ng-click="ir('palestras')">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</section>

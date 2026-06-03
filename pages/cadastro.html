@@ -1,0 +1,34 @@
+<!-- =============================================
+     PÁGINA: Cadastro de Usuário
+     ng-show="tela === 'cadastro'"
+============================================= -->
+<section class="page" ng-show="tela === 'cadastro'">
+  <div class="card card-auth">
+    <div class="card-header">
+      <h2>Criar Conta</h2>
+      <p>Preencha seus dados para se cadastrar</p>
+    </div>
+    <form ng-submit="cadastrar()" novalidate>
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" ng-model="cf.nome" placeholder="João Silva">
+      </div>
+      <div class="form-group">
+        <label>CPF</label>
+        <input type="text" ng-model="cf.cpf" placeholder="000.000.000-00" ng-keyup="fmtCPF()" maxlength="14">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" ng-model="cf.email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Senha <span class="field-hint">mínimo 6 caracteres</span></label>
+        <input type="password" ng-model="cf.senha" placeholder="••••••••">
+      </div>
+      <div class="alert alert-error"   ng-show="cErro">{{ cErro }}</div>
+      <div class="alert alert-success" ng-show="cOk">{{ cOk }}</div>
+      <button type="submit" class="btn btn-primary btn-full">Cadastrar</button>
+      <button type="button" class="btn btn-ghost btn-full" ng-click="ir('login')">Já tem conta? Entrar</button>
+    </form>
+  </div>
+</section>

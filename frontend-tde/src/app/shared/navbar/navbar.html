@@ -1,0 +1,21 @@
+<nav class="navbar">
+  <a routerLink="/dashboard" class="nav-brand">
+    <span class="brand-icon">◆</span> Jett Events
+  </a>
+  <div class="nav-links">
+    <span class="nav-user">{{ auth.usuario()!.nome }}</span>
+    @if (auth.isAdmin()) {
+      <span class="nav-badge">Admin</span>
+    }
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/eventos" routerLinkActive="active">Eventos</a>
+    <a routerLink="/palestras" routerLinkActive="active">Palestras</a>
+    <a routerLink="/minicursos" routerLinkActive="active">Minicursos</a>
+    @if (auth.isAdmin()) {
+      <a routerLink="/usuarios" routerLinkActive="active">Usuários</a>
+      <a routerLink="/inscritos" routerLinkActive="active">Inscritos</a>
+    }
+    <a routerLink="/perfil" routerLinkActive="active">Perfil</a>
+    <button class="btn-logout" (click)="auth.logout()">Sair</button>
+  </div>
+</nav>

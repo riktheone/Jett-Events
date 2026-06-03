@@ -1,0 +1,43 @@
+<div class="main-content page">
+  <div class="page-top-actions">
+    <div>
+      <p style="color:var(--texto-fraco);font-size:.88rem;">Listagem</p>
+      <h2>Eventos</h2>
+    </div>
+    @if (auth.isAdmin()) {
+      <a routerLink="/eventos/novo" class="btn btn-primary btn-sm">+ Novo evento</a>
+    }
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+
+  @for (ev of lista(); track ev.id) {
+    <div class="item-card">
+      <div class="item-header">
+        <span class="item-title">{{ ev.nome }}</span>
+        <span class="tag-vagas">{{ ev.numero_vagas }} vagas</span>
+      </div>
+      <div class="item-meta">
+        <span>📅 {{ ev.dt_inicio }} → {{ ev.dt_fim }}</span>
+        <span>⏰ Inscrições até {{ ev.dt_limite_inscricao }}</span>
+        <span>👤 {{ ev.nome_responsavel }}</span>
+      </div>
+      @if (ev.descricao) {
+        <p class="item-desc">{{ ev.descricao }}</p>
+      }
+      <div class="item-acoes">
+        <a [routerLink]="['/programacao', ev.id]" class="btn btn-info btn-sm">Programação</a>
+        <button class="btn btn-success btn-sm" (click)="inscrever(ev)">Inscrever-se</button>
+        <button class="btn btn-ghost btn-sm" (click)="cancelarInscricao(ev)">Cancelar inscrição</button>
+        @if (auth.isAdmin()) {
+          <a [routerLink]="['/eventos', ev.id, 'editar']" class="btn btn-outline btn-sm">Editar</a>
+          <button class="btn btn-danger btn-sm" (click)="remover(ev)">Remover</button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (lista().length === 0 && !erro()) {
+    <div class="alert alert-info">Nenhum evento cadastrado.</div>
+  }
+</div>

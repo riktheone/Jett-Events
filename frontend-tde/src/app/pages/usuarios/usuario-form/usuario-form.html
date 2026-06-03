@@ -1,0 +1,41 @@
+<div class="main-content page">
+  <a routerLink="/usuarios" class="btn-back">← Voltar</a>
+  <div class="page-top">
+    <h2>{{ editando() ? 'Editar Usuário' : 'Novo Usuário' }}</h2>
+  </div>
+
+  @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
+  @if (ok()) { <div class="alert alert-success">{{ ok() }}</div> }
+
+  <div class="card">
+    <div class="form-group">
+      <label>Nome</label>
+      <input type="text" [(ngModel)]="nome" placeholder="Nome completo">
+    </div>
+    <div class="form-group">
+      <label>CPF</label>
+      <input type="text" [value]="cpf" (input)="formatarCPF($event)" placeholder="000.000.000-00" [disabled]="editando()">
+    </div>
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" [(ngModel)]="email" placeholder="email@exemplo.com">
+    </div>
+    @if (!editando()) {
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" [(ngModel)]="senha" placeholder="Mínimo 6 caracteres">
+      </div>
+    } @else {
+      <div class="form-group">
+        <label>Nova senha <span style="color:var(--texto-fraco);text-transform:none;">(deixe em branco para não alterar)</span></label>
+        <input type="password" [(ngModel)]="novaSenha" placeholder="Nova senha">
+      </div>
+    }
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="salvar()" [disabled]="carregando()">
+        {{ carregando() ? 'Salvando...' : 'Salvar' }}
+      </button>
+      <a routerLink="/usuarios" class="btn btn-ghost">Cancelar</a>
+    </div>
+  </div>
+</div>

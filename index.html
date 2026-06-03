@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR" ng-app="jettEventsApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jett Events</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- CSS separado por responsabilidade -->
+  <link rel="stylesheet" href="css/base.css">       <!-- variáveis, reset, navbar, layout -->
+  <link rel="stylesheet" href="css/components.css"> <!-- cards, forms, botões, alertas, badges -->
+  <link rel="stylesheet" href="css/pages.css">      <!-- estilos específicos de cada página -->
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" ng-controller="NavController">
+    <div class="nav-brand">
+      <span class="brand-icon">◆</span>
+      <span>Jett Events</span>
+    </div>
+    <div class="nav-links" ng-if="sessao">
+      <span class="nav-user">Olá, {{ sessao.nome }}</span>
+      <span class="nav-badge" ng-if="sessao.administrador">Admin</span>
+      <button class="btn-logout" ng-click="logout()">Sair</button>
+    </div>
+  </nav>
+
+  <main class="main-content" ng-controller="AppController">
+
+    <!-- Indicador de carregamento global -->
+    <div ng-show="carregando" style="position:fixed;top:0;left:0;right:0;height:3px;background:var(--primaria);z-index:999;animation:fadeIn .1s"></div>
+
+    <!-- LOGIN         → pages/login.html -->
+    <section class="page" ng-show="tela === 'login'">
+      <div class="card card-auth">
+        <div class="card-header">
+          <h1>Jett Events</h1>
+          <p>Gerencie seus eventos com elegância</p>
+        </div>
+        <form ng-submit="login()" novalidate>
+          <div class="form-group">
+            <label>CPF</label>
+            <input type="text"
+                   ng-model="lf.cpf"
+                   placeholder="000.000.000-00"
+                   maxlength="14"
+                   ng-keyup="fmtCPFLogin()">
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" ng-model="lf.senha" placeholder="••••••••">
+          </div>
+          <div class="alert alert-error" ng-show="lErro">{{ lErro }}</div>
+          <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+          <button type="button" class="btn btn-ghost btn-full" ng-click="ir('cadastro')">Não tem conta? Cadastre-se</button>
+          <button type="button" class="btn btn-ghost btn-full" ng-click="ir('redefinirSenha')">Esqueci minha senha</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- CADASTRO      → pages/cadastro.html -->
+    <section class="page" ng-show="tela === 'cadastro'">
+      <div class="card card-auth">
+        <div class="card-header">
+          <h2>Criar Conta</h2>
+          <p>Preencha seus dados para se cadastrar</p>
+        </div>
+        <form ng-submit="cadastrar()" novalidate>
+          <div class="form-group">
+            <label>Nome completo</label>
+            <input type="text" ng-model="cf.nome" placeholder="João Silva">
+          </div>
+          <div class="form-group">
+            <label>CPF</label>
+            <input type="text" ng-model="cf.cpf" placeholder="000.000.000-00" ng-keyup="fmtCPF()" maxlength="14">
+          </div>
+          <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" ng-model="cf.email" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label>Senha <span class="field-hint">mínimo 6 caracteres</span></label>
+            <input type="password" ng-model="cf.senha" placeholder="••••••••">
+          </div>
+          <div class="alert alert-error"   ng-show="cErro">{{ cErro }}</div>
+          <div class="alert alert-success" ng-show="cOk">{{ cOk }}</div>
+          <button type="submit" class="btn btn-primary btn-full">Cadastrar</button>
+          <button type="button" class="btn btn-ghost btn-full" ng-click="ir('login')">Já tem conta? Entrar</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- REDEFINIR SENHA → pages/redefinir-senha.html -->
+    <section class="page" ng-show="tela === 'redefinirSenha'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir(me ? 'perfil' : 'login')">← Voltar</button>
+        <h2>Redefinir <span class="accent">Senha</span></h2>
+      </div>
+      <div class="card">
+        <div class="alert alert-info" style="margin-bottom:20px">
+          Para redefinir sua senha, informe seu CPF cadastrado e escolha uma nova senha.
+        </div>
+        <form ng-submit="redefinirSenha()" novalidate>
+          <div class="form-group">
+            <label>CPF cadastrado</label>
+            <input type="text" ng-model="rsf.cpf" placeholder="000.000.000-00" maxlength="14">
+          </div>
+          <div class="form-group">
+            <label>Nova senha <span class="field-hint">mínimo 6 caracteres</span></label>
+            <input type="password" ng-model="rsf.novaSenha" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label>Confirmar nova senha</label>
+            <input type="password" ng-model="rsf.confirmarSenha" placeholder="••••••••">
+          </div>
+          <div class="alert alert-error"   ng-show="rsErro">{{ rsErro }}</div>
+          <div class="alert alert-success" ng-show="rsOk">{{ rsOk }}</div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Redefinir Senha</button>
+            <button type="button" class="btn btn-ghost" ng-click="ir(me ? 'perfil' : 'login')">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- DASHBOARD     → pages/dashboard.html -->
+    <section class="page" ng-show="tela === 'dashboard'">
+      <div class="dash-header">
+        <h2>Painel <span class="accent">de Controle</span></h2>
+        <p>Bem-vindo ao Jett Events, {{ me.nome }}</p>
+      </div>
+      <div class="cards-grid">
+        <div class="action-card" ng-click="ir('perfil')">
+          <div class="action-icon">👤</div><h3>Meu Perfil</h3><p>Ver e editar seus dados</p>
+        </div>
+        <div class="action-card" ng-click="ir('eventos')">
+          <div class="action-icon">🎫</div><h3>Eventos</h3><p>Ver e se inscrever em eventos</p>
+        </div>
+        <div class="action-card" ng-click="ir('minicursos')">
+          <div class="action-icon">📚</div><h3>Minicursos</h3><p>Ver e se inscrever em minicursos</p>
+        </div>
+        <div class="action-card" ng-click="ir('palestras')">
+          <div class="action-icon">🎤</div><h3>Palestras</h3><p>Ver palestras disponíveis</p>
+        </div>
+        <div class="action-card action-card-admin" ng-if="me.administrador" ng-click="ir('usuarios')">
+          <div class="action-icon">⚙️</div><h3>Usuários</h3><p>Gerenciar usuários</p>
+        </div>
+        <div class="action-card action-card-admin" ng-if="me.administrador" ng-click="ir('inscritos')">
+          <div class="action-icon">📋</div><h3>Inscritos</h3><p>Ver usuários inscritos</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERFIL        → pages/perfil.html -->
+    <section class="page" ng-show="tela === 'perfil'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+        <h2>Meu <span class="accent">Perfil</span></h2>
+      </div>
+      <div class="card">
+        <div class="perfil-header">
+          <div class="avatar">{{ me.nome | ini }}</div>
+          <div>
+            <h3>{{ me.nome }}</h3>
+            <span class="badge" ng-class="me.administrador?'badge-admin':'badge-user'">{{ me.tipo }}</span>
+          </div>
+        </div>
+        <div ng-hide="editando">
+          <div class="info-row"><span class="info-label">CPF</span><span class="info-value">{{ me.cpf }}</span></div>
+          <div class="info-row"><span class="info-label">E-mail</span><span class="info-value">{{ me.email }}</span></div>
+          <div class="info-row"><span class="info-label">Nome</span><span class="info-value">{{ me.nome }}</span></div>
+          <div class="info-row"><span class="info-label">Tipo de Conta</span><span class="info-value">{{ me.tipo }}</span></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" ng-click="startEdit()">Editar dados</button>
+            <button class="btn btn-ghost"   ng-click="ir('redefinirSenha')">Redefinir Senha</button>
+          </div>
+        </div>
+        <div ng-show="editando">
+          <form ng-submit="saveEdit()" novalidate>
+            <div class="form-group">
+              <label>CPF <span class="field-hint">(não pode ser alterado)</span></label>
+              <input type="text" ng-value="me.cpf" disabled class="input-disabled">
+            </div>
+            <div class="form-group"><label>Nome</label><input type="text" ng-model="ef.nome"></div>
+            <div class="form-group"><label>E-mail</label><input type="email" ng-model="ef.email"></div>
+            <div class="alert alert-error"   ng-show="eErro">{{ eErro }}</div>
+            <div class="alert alert-success" ng-show="eOk">{{ eOk }}</div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="button" class="btn btn-ghost" ng-click="cancelEdit()">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- USUÁRIOS      → pages/usuarios.html -->
+    <section class="page" ng-show="tela === 'usuarios'">
+      <div class="page-top-actions">
+        <div>
+          <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+          <h2>Gerenciar <span class="accent">Usuários</span></h2>
+        </div>
+        <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novoUsuario')">+ Novo Usuário</button>
+      </div>
+      <div class="alert alert-error" ng-if="!me.administrador">Acesso negado. Apenas administradores podem acessar esta área.</div>
+      <div ng-if="me.administrador">
+        <div class="card" ng-repeat="u in listaUsers" ng-if="u.id !== me.id">
+          <div class="usuario-row">
+            <div class="usuario-info">
+              <div class="avatar avatar-sm">{{ u.nome | ini }}</div>
+              <div>
+                <strong>{{ u.nome }}</strong>
+                <small>{{ u.email }} · CPF: {{ u.cpf }}</small>
+                <span class="badge" ng-class="u.administrador?'badge-admin':'badge-user'">{{ u.tipo }}</span>
+              </div>
+            </div>
+            <div class="usuario-acoes">
+              <button class="btn btn-sm btn-ghost"   ng-click="editarUsuario(u)">✏️ Editar</button>
+              <button class="btn btn-sm btn-outline"  ng-if="!u.administrador" ng-click="promover(u)">⬆ Promover</button>
+              <button class="btn btn-sm btn-ghost"    ng-if="u.administrador"  ng-click="rebaixar(u)">⬇ Rebaixar</button>
+              <button class="btn btn-sm btn-danger"   ng-click="remover(u)">🗑 Remover</button>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-info" ng-show="semOutros()">Nenhum outro usuário cadastrado.</div>
+      </div>
+    </section>
+
+    <!-- NOVO USUÁRIO  → pages/usuarios.html -->
+    <section class="page" ng-show="tela === 'novoUsuario'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('usuarios')">← Voltar</button>
+        <h2>{{ editandoUsuario ? 'Editar' : 'Cadastrar' }} <span class="accent">Usuário</span></h2>
+      </div>
+      <div class="card">
+        <form ng-submit="salvarUsuario()" novalidate>
+          <div class="form-group"><label>Nome completo</label><input type="text" ng-model="uf.nome" placeholder="Nome do usuário"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>CPF</label>
+              <input type="text" ng-model="uf.cpf" placeholder="000.000.000-00" maxlength="14"
+                ng-disabled="editandoUsuario" ng-class="editandoUsuario?'input-disabled':''">
+            </div>
+            <div class="form-group">
+              <label>Tipo de Conta</label>
+              <select ng-model="uf.tipo">
+                <option value="comum">Comum</option>
+                <option value="administrador">Administrador</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>E-mail</label><input type="email" ng-model="uf.email" placeholder="email@exemplo.com"></div>
+          <div class="form-group" ng-if="!editandoUsuario">
+            <label>Senha <span class="field-hint">mínimo 6 caracteres</span></label>
+            <input type="password" ng-model="uf.senha" placeholder="••••••••">
+          </div>
+          <div class="form-group" ng-if="editandoUsuario">
+            <label>Nova senha <span class="field-hint">deixe vazio para manter a atual</span></label>
+            <input type="password" ng-model="uf.novaSenha" placeholder="••••••••">
+          </div>
+          <div class="alert alert-error"   ng-show="ufErro">{{ ufErro }}</div>
+          <div class="alert alert-success" ng-show="ufOk">{{ ufOk }}</div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ editandoUsuario ? 'Salvar alterações' : 'Cadastrar usuário' }}</button>
+            <button type="button" class="btn btn-ghost" ng-click="ir('usuarios')">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- EVENTOS       → pages/eventos.html -->
+    <section class="page" ng-show="tela === 'eventos'">
+      <div class="page-top-actions">
+        <div>
+          <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+          <h2>Eventos <span class="accent">Disponíveis</span></h2>
+        </div>
+        <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novoEvento')">+ Novo Evento</button>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:.82rem;font-weight:500;color:var(--texto-fraco);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Filtrar por período</div>
+        <div class="form-row" style="margin-bottom:10px">
+          <div class="form-group" style="margin-bottom:0"><label>Data início</label><input type="date" ng-model="filtro.dt_inicio"></div>
+          <div class="form-group" style="margin-bottom:0"><label>Data fim</label><input type="date" ng-model="filtro.dt_fim"></div>
+        </div>
+        <div class="alert alert-error" ng-show="evErro" style="margin-bottom:8px">{{ evErro }}</div>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-sm" ng-click="filtrarEventos()">🔍 Filtrar</button>
+          <button class="btn btn-ghost btn-sm" ng-show="filtrando" ng-click="limparFiltro()">✕ Limpar filtro</button>
+        </div>
+        <div class="alert alert-info" ng-show="filtrando" style="margin-top:10px;margin-bottom:0">
+          Exibindo eventos de {{ filtro.dt_inicio | date:'dd/MM/yyyy' }} até {{ filtro.dt_fim | date:'dd/MM/yyyy' }}.
+        </div>
+      </div>
+      <div ng-if="listaEventos.length === 0" class="alert alert-info">Nenhum evento encontrado.</div>
+      <div class="item-card" ng-repeat="ev in listaEventos">
+        <div class="item-header">
+          <span class="item-title">{{ ev.nome }}</span>
+          <span class="tag tag-vagas">{{ vagasRestantesEvento(ev) }} vagas</span>
+        </div>
+        <div class="item-meta">
+          <span>📅 Início: {{ ev.dt_inicio | date:'dd/MM/yyyy' }}</span>
+          <span>🏁 Fim: {{ ev.dt_fim | date:'dd/MM/yyyy' }}</span>
+          <span>⏰ Inscrições até: {{ ev.dt_limite_inscricao | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="item-meta">
+          <span>👤 {{ ev.nome_responsavel }}</span>
+          <span>📧 {{ ev.email_responsavel }}</span>
+        </div>
+        <div class="item-desc">{{ ev.descricao }}</div>
+        <div class="item-acoes">
+          <button class="btn btn-sm btn-success" ng-if="!estaInscritoEvento(ev) && vagasRestantesEvento(ev) > 0" ng-click="inscreverEvento(ev)">✅ Inscrever-se</button>
+          <button class="btn btn-sm btn-danger"  ng-if="estaInscritoEvento(ev)" ng-click="cancelarInscricaoEvento(ev)">❌ Cancelar inscrição</button>
+          <span class="tag tag-ativo"   ng-if="estaInscritoEvento(ev)">Inscrito</span>
+          <span class="tag tag-inativo" ng-if="!estaInscritoEvento(ev) && vagasRestantesEvento(ev) <= 0">Vagas esgotadas</span>
+          <button class="btn btn-sm btn-info"   ng-click="verProgramacao(ev)">📋 Programação</button>
+          <button class="btn btn-sm btn-ghost"  ng-if="me.administrador" ng-click="editarEvento(ev)">✏️ Editar</button>
+          <button class="btn btn-sm btn-danger" ng-if="me.administrador" ng-click="removerEvento(ev)">🗑 Remover</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOVO EVENTO   → pages/eventos.html -->
+    <section class="page" ng-show="tela === 'novoEvento'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('eventos')">← Voltar</button>
+        <h2>{{ editandoEvento ? 'Editar' : 'Cadastrar' }} <span class="accent">Evento</span></h2>
+      </div>
+      <div class="card">
+        <form ng-submit="salvarEvento()" novalidate>
+          <div class="form-group"><label>Nome do evento</label><input type="text" ng-model="evf.nome" placeholder="Ex: Semana de Tecnologia 2025"></div>
+          <div class="form-group"><label>Descrição</label><textarea ng-model="evf.descricao" placeholder="Descreva o evento..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Data de início</label><input type="date" ng-model="evf.dt_inicio"></div>
+            <div class="form-group"><label>Data de fim</label><input type="date" ng-model="evf.dt_fim"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Data limite de inscrição</label><input type="date" ng-model="evf.dt_limite_inscricao"></div>
+            <div class="form-group"><label>Número de vagas</label><input type="number" ng-model="evf.numero_vagas" placeholder="100" min="1"></div>
+          </div>
+          <h3 class="section-title">Responsável pelo evento</h3>
+          <div class="form-group"><label>Nome do responsável</label><input type="text" ng-model="evf.nome_responsavel" placeholder="Nome completo"></div>
+          <div class="form-row">
+            <div class="form-group"><label>CPF do responsável</label><input type="text" ng-model="evf.cpf_responsavel" placeholder="000.000.000-00" maxlength="14"></div>
+            <div class="form-group"><label>E-mail do responsável</label><input type="email" ng-model="evf.email_responsavel" placeholder="responsavel@email.com"></div>
+          </div>
+          <div class="alert alert-error"   ng-show="evErro">{{ evErro }}</div>
+          <div class="alert alert-success" ng-show="evOk">{{ evOk }}</div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ editandoEvento ? 'Salvar alterações' : 'Cadastrar evento' }}</button>
+            <button type="button" class="btn btn-ghost" ng-click="ir('eventos')">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- PROGRAMAÇÃO   → pages/programacao.html -->
+    <section class="page" ng-show="tela === 'programacao'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('eventos')">← Voltar</button>
+        <h2>Programação — <span class="accent">{{ eventoSelecionado.nome }}</span></h2>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="item-meta">
+          <span>📅 Início: {{ eventoSelecionado.dt_inicio | date:'dd/MM/yyyy' }}</span>
+          <span>🏁 Fim: {{ eventoSelecionado.dt_fim | date:'dd/MM/yyyy' }}</span>
+          <span>👤 {{ eventoSelecionado.nome_responsavel }}</span>
+        </div>
+        <div class="item-desc" style="margin-top:8px;margin-bottom:0">{{ eventoSelecionado.descricao }}</div>
+      </div>
+      <h3 class="section-title">🎤 Palestras</h3>
+      <div class="alert alert-info" ng-if="programacaoPalestras.length === 0">Nenhuma palestra cadastrada para este evento.</div>
+      <div class="item-card" ng-repeat="pl in programacaoPalestras">
+        <div class="item-header"><span class="item-title">{{ pl.nome }}</span></div>
+        <div class="item-meta">
+          <span>📅 {{ pl.dt_palestra | date:'dd/MM/yyyy' }}</span>
+          <span>🕐 {{ pl.horario_inicio_palestra }} – {{ pl.horario_fim_palestra }}</span>
+          <span>🎤 {{ pl.nome_palestrante }}</span>
+        </div>
+        <div class="item-desc">{{ pl.descricao }}</div>
+        <div ng-if="pl.minicurriculo_palestrante" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+          <strong>Sobre o palestrante:</strong> {{ pl.minicurriculo_palestrante }}
+        </div>
+      </div>
+      <h3 class="section-title">📚 Minicursos</h3>
+      <div class="alert alert-info" ng-if="programacaoMinicursos.length === 0">Nenhum minicurso cadastrado para este evento.</div>
+      <div class="item-card" ng-repeat="mc in programacaoMinicursos">
+        <div class="item-header">
+          <span class="item-title">{{ mc.nome }}</span>
+          <span class="tag tag-vagas">{{ vagasRestantesMinicurso(mc) }} vagas</span>
+        </div>
+        <div class="item-meta">
+          <span>📅 {{ mc.dt_minicurso | date:'dd/MM/yyyy' }}</span>
+          <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
+          <span>👨‍🏫 {{ mc.nome_instrutor }}</span>
+          <span>⏰ Inscrições até: {{ mc.dt_limite_inscricao | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="item-desc">{{ mc.descricao }}</div>
+        <div ng-if="mc.minicurriculo_instrutor" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+          <strong>Sobre o instrutor:</strong> {{ mc.minicurriculo_instrutor }}
+        </div>
+        <div class="item-acoes">
+          <button class="btn btn-sm btn-success" ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) > 0" ng-click="inscreverMinicurso(mc)">✅ Inscrever-se</button>
+          <button class="btn btn-sm btn-danger"  ng-if="estaInscritoMinicurso(mc)" ng-click="cancelarInscricaoMinicurso(mc)">❌ Cancelar inscrição</button>
+          <span class="tag tag-ativo"   ng-if="estaInscritoMinicurso(mc)">Inscrito</span>
+          <span class="tag tag-inativo" ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) <= 0">Vagas esgotadas</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PALESTRAS     → pages/palestras.html -->
+    <section class="page" ng-show="tela === 'palestras'">
+      <div class="page-top-actions">
+        <div>
+          <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+          <h2>Palestras <span class="accent">Disponíveis</span></h2>
+        </div>
+        <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novaPalestra')">+ Nova Palestra</button>
+      </div>
+      <div ng-if="listaPalestras.length === 0" class="alert alert-info">Nenhuma palestra cadastrada ainda.</div>
+      <div class="item-card" ng-repeat="pl in listaPalestras">
+        <div class="item-header"><span class="item-title">{{ pl.nome }}</span></div>
+        <div class="item-meta">
+          <span>🎤 {{ pl.nome_palestrante }}</span>
+          <span>📅 {{ pl.dt_palestra | date:'dd/MM/yyyy' }}</span>
+          <span>🕐 {{ pl.horario_inicio_palestra }} – {{ pl.horario_fim_palestra }}</span>
+        </div>
+        <div class="item-desc">{{ pl.descricao }}</div>
+        <div ng-if="pl.minicurriculo_palestrante" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+          <strong>Sobre o palestrante:</strong> {{ pl.minicurriculo_palestrante }}
+        </div>
+        <div class="item-meta" ng-if="pl.id_evento"><span>🎫 Evento: <strong>{{ getNomeEvento(pl.id_evento) }}</strong></span></div>
+        <div class="item-acoes" ng-if="me.administrador">
+          <button class="btn btn-sm btn-ghost"  ng-click="editarPalestra(pl)">✏️ Editar</button>
+          <button class="btn btn-sm btn-danger" ng-click="removerPalestra(pl)">🗑 Remover</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOVA PALESTRA → pages/palestras.html -->
+    <section class="page" ng-show="tela === 'novaPalestra'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('palestras')">← Voltar</button>
+        <h2>{{ editandoPalestra ? 'Editar' : 'Cadastrar' }} <span class="accent">Palestra</span></h2>
+      </div>
+      <div class="card">
+        <form ng-submit="salvarPalestra()" novalidate>
+          <div class="form-group"><label>Título da palestra</label><input type="text" ng-model="plf.nome" placeholder="Ex: Inteligência Artificial no Mercado"></div>
+          <div class="form-group"><label>Nome do palestrante</label><input type="text" ng-model="plf.nome_palestrante" placeholder="Nome do palestrante"></div>
+          <div class="form-group"><label>Minicurrículo do palestrante</label><textarea ng-model="plf.minicurriculo_palestrante" placeholder="Breve currículo do palestrante..."></textarea></div>
+          <div class="form-group"><label>Descrição</label><textarea ng-model="plf.descricao" placeholder="Sobre o que será a palestra..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Data da palestra</label><input type="date" ng-model="plf.dt_palestra"></div>
+            <div class="form-group"><label>Horário de início</label><input type="time" ng-model="plf.horario_inicio_palestra"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Horário de fim</label><input type="time" ng-model="plf.horario_fim_palestra"></div>
+            <div class="form-group">
+              <label>Vincular a Evento <span class="field-hint">(opcional)</span></label>
+              <select ng-model="plf.id_evento">
+                <option value="">— Nenhum —</option>
+                <option ng-repeat="ev in listaEventosOpcoes" ng-value="ev.id">{{ ev.nome }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="alert alert-error"   ng-show="plErro">{{ plErro }}</div>
+          <div class="alert alert-success" ng-show="plOk">{{ plOk }}</div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ editandoPalestra ? 'Salvar alterações' : 'Cadastrar palestra' }}</button>
+            <button type="button" class="btn btn-ghost" ng-click="ir('palestras')">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- MINICURSOS    → pages/minicursos.html -->
+    <section class="page" ng-show="tela === 'minicursos'">
+      <div class="page-top-actions">
+        <div>
+          <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+          <h2>Minicursos <span class="accent">Disponíveis</span></h2>
+        </div>
+        <button class="btn btn-primary btn-sm" ng-if="me.administrador" ng-click="ir('novoMinicurso')">+ Novo Minicurso</button>
+      </div>
+      <div ng-if="listaMinicursos.length === 0" class="alert alert-info">Nenhum minicurso cadastrado ainda.</div>
+      <div class="item-card" ng-repeat="mc in listaMinicursos">
+        <div class="item-header">
+          <span class="item-title">{{ mc.nome }}</span>
+          <span class="tag tag-vagas">{{ vagasRestantesMinicurso(mc) }} vagas</span>
+        </div>
+        <div class="item-meta">
+          <span>👨‍🏫 {{ mc.nome_instrutor }}</span>
+          <span>📅 {{ mc.dt_minicurso | date:'dd/MM/yyyy' }}</span>
+          <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
+          <span>⏰ Inscrições até: {{ mc.dt_limite_inscricao | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="item-desc">{{ mc.descricao }}</div>
+        <div ng-if="mc.minicurriculo_instrutor" style="font-size:.82rem;color:var(--texto-fraco);font-style:italic;margin-bottom:8px">
+          <strong>Sobre o instrutor:</strong> {{ mc.minicurriculo_instrutor }}
+        </div>
+        <div class="item-meta" ng-if="mc.id_evento"><span>🎫 Evento: <strong>{{ getNomeEvento(mc.id_evento) }}</strong></span></div>
+        <div class="item-acoes">
+          <button class="btn btn-sm btn-success" ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) > 0" ng-click="inscreverMinicurso(mc)">✅ Inscrever-se</button>
+          <button class="btn btn-sm btn-danger"  ng-if="estaInscritoMinicurso(mc)" ng-click="cancelarInscricaoMinicurso(mc)">❌ Cancelar inscrição</button>
+          <span class="tag tag-ativo"   ng-if="estaInscritoMinicurso(mc)">Inscrito</span>
+          <span class="tag tag-inativo" ng-if="!estaInscritoMinicurso(mc) && vagasRestantesMinicurso(mc) <= 0">Vagas esgotadas</span>
+          <button class="btn btn-sm btn-ghost"  ng-if="me.administrador" ng-click="editarMinicurso(mc)">✏️ Editar</button>
+          <button class="btn btn-sm btn-danger" ng-if="me.administrador" ng-click="removerMinicurso(mc)">🗑 Remover</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOVO MINICURSO → pages/minicursos.html -->
+    <section class="page" ng-show="tela === 'novoMinicurso'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('minicursos')">← Voltar</button>
+        <h2>{{ editandoMinicurso ? 'Editar' : 'Cadastrar' }} <span class="accent">Minicurso</span></h2>
+      </div>
+      <div class="card">
+        <form ng-submit="salvarMinicurso()" novalidate>
+          <div class="form-group"><label>Título do minicurso</label><input type="text" ng-model="mcf.nome" placeholder="Ex: Introdução ao Python"></div>
+          <div class="form-group"><label>Nome do instrutor</label><input type="text" ng-model="mcf.nome_instrutor" placeholder="Nome do instrutor"></div>
+          <div class="form-group"><label>Minicurrículo do instrutor</label><textarea ng-model="mcf.minicurriculo_instrutor" placeholder="Breve currículo do instrutor..."></textarea></div>
+          <div class="form-group"><label>Descrição</label><textarea ng-model="mcf.descricao" placeholder="Conteúdo e objetivos do minicurso..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Data do minicurso</label><input type="date" ng-model="mcf.dt_minicurso"></div>
+            <div class="form-group"><label>Data limite de inscrição</label><input type="date" ng-model="mcf.dt_limite_inscricao"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Horário de início</label><input type="time" ng-model="mcf.horario_inicio_minicurso"></div>
+            <div class="form-group"><label>Horário de fim</label><input type="time" ng-model="mcf.horario_fim_minicurso"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Número de vagas</label><input type="number" ng-model="mcf.numero_vagas" placeholder="30" min="1"></div>
+            <div class="form-group">
+              <label>Vincular a Evento <span class="field-hint">(opcional)</span></label>
+              <select ng-model="mcf.id_evento">
+                <option value="">— Nenhum —</option>
+                <option ng-repeat="ev in listaEventosOpcoes" ng-value="ev.id">{{ ev.nome }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="alert alert-error"   ng-show="mcErro">{{ mcErro }}</div>
+          <div class="alert alert-success" ng-show="mcOk">{{ mcOk }}</div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ editandoMinicurso ? 'Salvar alterações' : 'Cadastrar minicurso' }}</button>
+            <button type="button" class="btn btn-ghost" ng-click="ir('minicursos')">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- INSCRITOS     → pages/inscritos.html -->
+    <section class="page" ng-show="tela === 'inscritos'">
+      <div class="page-top">
+        <button class="btn-back" ng-click="ir('dashboard')">← Voltar</button>
+        <h2>Usuários <span class="accent">Inscritos</span></h2>
+      </div>
+      <div class="alert alert-error" ng-if="!me.administrador">Acesso negado. Apenas administradores podem visualizar esta área.</div>
+      <div ng-if="me.administrador">
+        <h3 class="section-title">🎫 Inscrições em Eventos</h3>
+        <div ng-if="listaEventos.length === 0" class="alert alert-info">Nenhum evento cadastrado.</div>
+        <div class="card" ng-repeat="ev in listaEventos" ng-if="ev._inscritos && ev._inscritos.length > 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <strong style="font-size:.97rem">{{ ev.nome }}</strong>
+            <span class="tag tag-vagas">{{ ev._inscritos.length }} inscrito(s)</span>
+          </div>
+          <div class="inscrito-row" ng-repeat="p in ev._inscritos">
+            <span class="inscrito-num">{{ $index + 1 }}</span>
+            <div class="avatar avatar-sm">{{ p.nome | ini }}</div>
+            <div class="inscrito-info">
+              <strong>{{ p.nome }}</strong>
+              <small>{{ p.email }} · CPF: {{ p.cpf }}</small>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-info" ng-if="semInscritosEventos()">Nenhum usuário inscrito em eventos ainda.</div>
+        <h3 class="section-title">📚 Inscrições em Minicursos</h3>
+        <div ng-if="listaMinicursos.length === 0" class="alert alert-info">Nenhum minicurso cadastrado.</div>
+        <div class="card" ng-repeat="mc in listaMinicursos" ng-if="mc._inscritos && mc._inscritos.length > 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <strong style="font-size:.97rem">{{ mc.nome }}</strong>
+            <span class="tag tag-vagas">{{ mc._inscritos.length }} inscrito(s)</span>
+          </div>
+          <div class="inscrito-row" ng-repeat="p in mc._inscritos">
+            <span class="inscrito-num">{{ $index + 1 }}</span>
+            <div class="avatar avatar-sm">{{ p.nome | ini }}</div>
+            <div class="inscrito-info">
+              <strong>{{ p.nome }}</strong>
+              <small>{{ p.email }} · CPF: {{ p.cpf }}</small>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-info" ng-if="semInscritosMinicursos()">Nenhum usuário inscrito em minicursos ainda.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
