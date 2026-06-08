@@ -4,6 +4,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { EventoService } from '../../../core/services/evento.service';
 import { apiError } from '../../../core/services/auth.service';
+import { formatCpf, isCpfComplete, onlyCpfDigits } from '../../../core/utils/cpf.util';
 import { Evento } from '../../../models/evento.model';
 
 @Component({
@@ -44,8 +45,15 @@ export class EventoForm implements OnInit {
     this.dt_limite_inscricao = ev.dt_limite_inscricao;
     this.numero_vagas = ev.numero_vagas;
     this.nome_responsavel = ev.nome_responsavel;
-    this.cpf_responsavel = ev.cpf_responsavel;
+    this.cpf_responsavel = formatCpf(ev.cpf_responsavel);
     this.email_responsavel = ev.email_responsavel;
+  }
+
+  formatarCPFResponsavel(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = formatCpf(input.value);
+    this.cpf_responsavel = formatted;
+    input.value = formatted;
   }
 
   async salvar(): Promise<void> {
@@ -53,13 +61,14 @@ export class EventoForm implements OnInit {
         !this.numero_vagas || !this.nome_responsavel || !this.cpf_responsavel || !this.email_responsavel) {
       this.erro.set('Preencha todos os campos obrigatórios.'); return;
     }
+    if (!isCpfComplete(this.cpf_responsavel)) { this.erro.set('CPF do responsavel deve conter 11 digitos.'); return; }
     const payload = {
       nome: this.nome, descricao: this.descricao,
       dt_inicio: this.dt_inicio, dt_fim: this.dt_fim,
       dt_limite_inscricao: this.dt_limite_inscricao,
       numero_vagas: this.numero_vagas,
       nome_responsavel: this.nome_responsavel,
-      cpf_responsavel: this.cpf_responsavel,
+      cpf_responsavel: onlyCpfDigits(this.cpf_responsavel),
       email_responsavel: this.email_responsavel
     };
     this.carregando.set(true); this.erro.set('');

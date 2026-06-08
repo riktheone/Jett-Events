@@ -3,7 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { apiError, hashSenha, formatCPF } from '../../../core/services/auth.service';
+import { apiError, hashSenha } from '../../../core/services/auth.service';
+import { formatCpf, isCpfComplete, onlyCpfDigits } from '../../../core/utils/cpf.util';
 
 @Component({
   selector: 'app-usuario-form',
@@ -34,7 +35,7 @@ export class UsuarioForm implements OnInit {
       this.usuarioSvc.obterTodos().subscribe({
         next: lista => {
           const u = lista.find(x => x.id === this.id);
-          if (u) { this.cpf = u.cpf; this.nome = u.nome; this.email = u.email; }
+          if (u) { this.cpf = formatCpf(u.cpf); this.nome = u.nome; this.email = u.email; }
         }
       });
     }
@@ -42,20 +43,22 @@ export class UsuarioForm implements OnInit {
 
   formatarCPF(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const f = formatCPF(input.value);
+    const f = formatCpf(input.value);
     this.cpf = f;
     input.value = f;
   }
 
   async salvar(): Promise<void> {
     if (!this.nome || !this.email) { this.erro.set('Nome e e-mail são obrigatórios.'); return; }
+    if (!isCpfComplete(this.cpf)) { this.erro.set('CPF deve conter 11 digitos.'); return; }
     this.carregando.set(true);
     this.erro.set('');
     try {
+      const cpf = onlyCpfDigits(this.cpf);
       if (this.editando()) {
         const senha = this.novaSenha ? await hashSenha(this.novaSenha) : await hashSenha('');
         const resp = await firstValueFrom(
-          this.usuarioSvc.atualizar(this.id, { cpf: this.cpf, nome: this.nome, email: this.email, senha })
+          this.usuarioSvc.atualizar(this.id, { cpf, nome: this.nome, email: this.email, senha })
         );
         this.ok.set(resp.msg || 'Usuário atualizado!');
       } else {
@@ -63,7 +66,7 @@ export class UsuarioForm implements OnInit {
         if (this.senha.length < 6) { this.erro.set('Senha mínimo 6 caracteres.'); this.carregando.set(false); return; }
         const hash = await hashSenha(this.senha);
         const resp = await firstValueFrom(
-          this.usuarioSvc.salvar({ cpf: this.cpf, nome: this.nome, email: this.email, senha: hash })
+          this.usuarioSvc.salvar({ cpf, nome: this.nome, email: this.email, senha: hash })
         );
         this.ok.set(resp.msg || 'Usuário cadastrado!');
       }
