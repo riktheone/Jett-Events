@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { MinicursoService } from '../../../core/services/minicurso.service';
 import { EventoService } from '../../../core/services/evento.service';
 import { apiError } from '../../../core/services/auth.service';
+import { dateInputValue, timeInputValue } from '../../../core/utils/date.util';
 import { Minicurso } from '../../../models/minicurso.model';
 import { Evento } from '../../../models/evento.model';
 
@@ -21,10 +22,13 @@ export class MinicursoForm implements OnInit {
 
   readonly editando = signal(false);
   id = 0;
-  nome = ''; descricao = '';
+  nome = '';
+  descricao = '';
   dt_minicurso = '';
-  horario_inicio_minicurso = ''; horario_fim_minicurso = '';
-  nome_instrutor = ''; minicurriculo_instrutor = '';
+  horario_inicio_minicurso = '';
+  horario_fim_minicurso = '';
+  nome_instrutor = '';
+  minicurriculo_instrutor = '';
   dt_limite_inscricao = '';
   numero_vagas = 0;
   id_evento = 0;
@@ -47,24 +51,29 @@ export class MinicursoForm implements OnInit {
   }
 
   private preencher(mc: Minicurso): void {
-    this.nome = mc.nome; this.descricao = mc.descricao ?? '';
-    this.dt_minicurso = mc.dt_minicurso;
-    this.horario_inicio_minicurso = mc.horario_inicio_minicurso;
-    this.horario_fim_minicurso = mc.horario_fim_minicurso;
+    this.nome = mc.nome;
+    this.descricao = mc.descricao ?? '';
+    this.dt_minicurso = dateInputValue(mc.dt_minicurso);
+    this.horario_inicio_minicurso = timeInputValue(mc.horario_inicio_minicurso);
+    this.horario_fim_minicurso = timeInputValue(mc.horario_fim_minicurso);
     this.nome_instrutor = mc.nome_instrutor;
     this.minicurriculo_instrutor = mc.minicurriculo_instrutor ?? '';
-    this.dt_limite_inscricao = mc.dt_limite_inscricao;
+    this.dt_limite_inscricao = dateInputValue(mc.dt_limite_inscricao);
     this.numero_vagas = mc.numero_vagas;
     this.id_evento = mc.id_evento;
   }
 
   async salvar(): Promise<void> {
-    if (!this.nome || !this.nome_instrutor || !this.dt_minicurso ||
-        !this.horario_inicio_minicurso || !this.horario_fim_minicurso || !this.dt_limite_inscricao) {
-      this.erro.set('Preencha todos os campos obrigatórios.'); return;
+    if (!this.id_evento || !this.nome || !this.descricao || !this.dt_minicurso ||
+        !this.horario_inicio_minicurso || !this.horario_fim_minicurso ||
+        !this.nome_instrutor || !this.minicurriculo_instrutor ||
+        !this.dt_limite_inscricao || !this.numero_vagas) {
+      this.erro.set('Preencha todos os campos obrigatorios.');
+      return;
     }
     const payload = {
-      nome: this.nome, descricao: this.descricao,
+      nome: this.nome,
+      descricao: this.descricao,
       dt_minicurso: this.dt_minicurso,
       horario_inicio_minicurso: this.horario_inicio_minicurso,
       horario_fim_minicurso: this.horario_fim_minicurso,
@@ -74,7 +83,8 @@ export class MinicursoForm implements OnInit {
       numero_vagas: this.numero_vagas,
       id_evento: this.id_evento
     };
-    this.carregando.set(true); this.erro.set('');
+    this.carregando.set(true);
+    this.erro.set('');
     try {
       const obs = this.editando()
         ? this.minicursoSvc.atualizar(this.id, payload)

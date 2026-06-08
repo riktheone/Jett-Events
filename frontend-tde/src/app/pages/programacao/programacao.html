@@ -1,12 +1,49 @@
 <div class="main-content page">
-  <a routerLink="/eventos" class="btn-back">← Voltar aos eventos</a>
+  <a routerLink="/eventos" class="btn-back">Voltar aos eventos</a>
   <div class="page-top">
-    <p style="color:var(--texto-fraco);font-size:.88rem;">Programação</p>
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Programacao</p>
     <h2>{{ nomeEvento() || 'Evento' }}</h2>
+    <div class="item-acoes" style="margin-top:12px;">
+      @if (estaInscritoNoEvento()) {
+        <button class="btn btn-ghost btn-sm" (click)="cancelarInscricaoEvento()">Cancelar inscricao no evento</button>
+      } @else {
+        <button class="btn btn-success btn-sm" (click)="iniciarInscricaoEvento()">Inscrever-se no evento</button>
+      }
+    </div>
   </div>
 
   @if (erro()) { <div class="alert alert-error">{{ erro() }}</div> }
   @if (carregando()) { <div class="alert alert-info">Carregando...</div> }
+
+  @if (inscricaoEventoAberta()) {
+    <div class="item-card">
+      <p class="section-title">Dados da inscricao no evento</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" [value]="cpf_evento" (input)="formatarCPFEvento($event)" placeholder="000.000.000-00">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" [(ngModel)]="telefone_evento" placeholder="(00) 00000-0000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" [(ngModel)]="nome_evento">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" [(ngModel)]="email_evento">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-success btn-sm" (click)="confirmarInscricaoEvento()">Confirmar inscricao</button>
+        <button class="btn btn-ghost btn-sm" (click)="cancelarFormularioEvento()">Cancelar</button>
+      </div>
+    </div>
+  }
 
   <p class="section-title">Palestras</p>
   @for (p of palestras(); track p.id) {
@@ -15,14 +52,12 @@
         <span class="item-title">{{ p.nome }}</span>
       </div>
       <div class="item-meta">
-        <span>📅 {{ p.dt_palestra }}</span>
-        <span>🕐 {{ p.horario_inicio_palestra }} – {{ p.horario_fim_palestra }}</span>
-        <span>🎙️ {{ p.nome_palestrante }}</span>
+        <span>{{ p.dt_palestra }}</span>
+        <span>{{ p.horario_inicio_palestra }} - {{ p.horario_fim_palestra }}</span>
+        <span>{{ p.nome_palestrante }}</span>
       </div>
-      @if (p.descricao) { <p class="item-desc">{{ p.descricao }}</p> }
-      @if (p.minicurriculo_palestrante) {
-        <p class="item-desc" style="font-style:italic;">{{ p.minicurriculo_palestrante }}</p>
-      }
+      <p class="item-desc">{{ p.descricao }}</p>
+      <p class="item-desc" style="font-style:italic;">{{ p.minicurriculo_palestrante }}</p>
     </div>
   }
   @if (palestras().length === 0 && !carregando()) {
@@ -37,19 +72,49 @@
         <span class="tag-vagas">{{ mc.numero_vagas }} vagas</span>
       </div>
       <div class="item-meta">
-        <span>📅 {{ mc.dt_minicurso }}</span>
-        <span>🕐 {{ mc.horario_inicio_minicurso }} – {{ mc.horario_fim_minicurso }}</span>
-        <span>📚 {{ mc.nome_instrutor }}</span>
-        <span>⏰ Inscrições até {{ mc.dt_limite_inscricao }}</span>
+        <span>{{ mc.dt_minicurso }}</span>
+        <span>{{ mc.horario_inicio_minicurso }} - {{ mc.horario_fim_minicurso }}</span>
+        <span>{{ mc.nome_instrutor }}</span>
+        <span>Inscricoes ate {{ mc.dt_limite_inscricao }}</span>
       </div>
-      @if (mc.descricao) { <p class="item-desc">{{ mc.descricao }}</p> }
+      <p class="item-desc">{{ mc.descricao }}</p>
+      <p class="item-desc" style="font-style:italic;">{{ mc.minicurriculo_instrutor }}</p>
       <div class="item-acoes">
         @if (estaInscrito(mc)) {
-          <button class="btn btn-ghost btn-sm" (click)="cancelarMinicurso(mc)">Cancelar inscrição</button>
+          <button class="btn btn-ghost btn-sm" (click)="cancelarMinicurso(mc)">Cancelar inscricao</button>
         } @else {
-          <button class="btn btn-success btn-sm" (click)="inscreverMinicurso(mc)">Inscrever-se</button>
+          <button class="btn btn-success btn-sm" (click)="iniciarInscricaoMinicurso(mc)">Inscrever-se</button>
         }
       </div>
+      @if (inscricaoMinicursoId() === mc.id) {
+        <div style="margin-top:14px;padding:14px;border:1px solid var(--borda);border-radius:8px;">
+          <p class="section-title">Dados da inscricao</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>CPF</label>
+              <input type="text" [value]="cpf_participante" (input)="formatarCPFInscricao($event)" placeholder="000.000.000-00">
+            </div>
+            <div class="form-group">
+              <label>Telefone</label>
+              <input type="text" [(ngModel)]="telefone_participante" placeholder="(00) 00000-0000">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" [(ngModel)]="nome_participante">
+            </div>
+            <div class="form-group">
+              <label>E-mail</label>
+              <input type="email" [(ngModel)]="email_participante">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-success btn-sm" (click)="confirmarInscricaoMinicurso(mc)">Confirmar inscricao</button>
+            <button class="btn btn-ghost btn-sm" (click)="cancelarFormularioInscricao()">Cancelar</button>
+          </div>
+        </div>
+      }
     </div>
   }
   @if (minicursos().length === 0 && !carregando()) {

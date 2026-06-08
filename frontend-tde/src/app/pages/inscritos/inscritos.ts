@@ -7,6 +7,12 @@ import { Minicurso } from '../../models/minicurso.model';
 
 interface EventoComInscritos extends Evento { inscritos: any[]; }
 interface MinicursoComInscritos extends Minicurso { _inscritos: any[]; }
+interface ParticipanteResumo {
+  nome?: string;
+  cpf?: string;
+  email?: string;
+  telefone?: string;
+}
 
 @Component({
   selector: 'app-inscritos',
@@ -20,6 +26,22 @@ export class Inscritos implements OnInit {
   readonly eventos = signal<EventoComInscritos[]>([]);
   readonly minicursos = signal<MinicursoComInscritos[]>([]);
   readonly erro = signal('');
+
+  nomeInscrito(inscrito: ParticipanteResumo | number | string): string {
+    if (this.temDadosDoParticipante(inscrito)) {
+      return inscrito.nome || 'Participante sem nome';
+    }
+    return 'Participante sem dados carregados';
+  }
+
+  detalhesInscrito(inscrito: ParticipanteResumo | number | string): string {
+    if (!this.temDadosDoParticipante(inscrito)) return '';
+    return [inscrito.cpf, inscrito.email, inscrito.telefone].filter(Boolean).join(' - ');
+  }
+
+  temDetalhesInscrito(inscrito: ParticipanteResumo | number | string): boolean {
+    return this.detalhesInscrito(inscrito).length > 0;
+  }
 
   ngOnInit(): void {
     this.eventoSvc.obterTodos().subscribe({
@@ -52,5 +74,9 @@ export class Inscritos implements OnInit {
         );
       }
     });
+  }
+
+  private temDadosDoParticipante(inscrito: ParticipanteResumo | number | string): inscrito is ParticipanteResumo {
+    return typeof inscrito === 'object' && inscrito !== null;
   }
 }

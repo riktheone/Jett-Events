@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Minicurso } from '../../models/minicurso.model';
 import { environment } from '../../../environments/environment';
+import { InscricaoPayload } from './evento.service';
 
 @Injectable({ providedIn: 'root' })
 export class MinicursoService {
@@ -29,10 +30,10 @@ export class MinicursoService {
     return this.http.delete<{ msg: string }>(`${this.base}/${id}`);
   }
 
-  inscrever(idMinicurso: number, idUsuario: number): Observable<{ msg: string }> {
+  inscrever(idMinicurso: number, payload: InscricaoPayload): Observable<{ msg: string }> {
     return this.http.post<{ msg: string }>(`${environment.apiUrl}/inscricao/minicurso`, {
       id_minicurso: idMinicurso,
-      id_usuario_participante: idUsuario
+      ...payload
     });
   }
 

@@ -83,7 +83,7 @@ export const routes: Routes = [
   },
   {
     path: 'inscritos',
-    canActivate: [authGuard, adminGuard],
+    canActivate: [authGuard],
     loadComponent: () => import('./pages/inscritos/inscritos').then(m => m.Inscritos)
   },
   {

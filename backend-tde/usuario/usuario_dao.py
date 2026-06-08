@@ -13,6 +13,10 @@ class UsuarioDAO(BaseDAO):
     def obterPorCPF(self, cpf):
         parametros = [cpf]
         return self.obterRegistroPorParametro("select id, cpf, nome, email, hash_senha, usuario_admin from usuarios where cpf = ?", parametros)
+
+    def obterPorEmail(self, email):
+        parametros = [email]
+        return self.obterRegistroPorParametro("select id, cpf, nome, email, hash_senha, usuario_admin from usuarios where lower(email) = lower(?)", parametros)
     
     def salvar(self, cpf, nome, email, senha):
         parametros = [cpf, nome, email, senha, False]

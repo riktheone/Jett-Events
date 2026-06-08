@@ -10,5 +10,6 @@ class Minicurso:
         self.nome_instrutor = nome_instrutor
         self.minicurriculo_instrutor = minicurriculo_instrutor
         self.dt_limite_inscricao = dt_limite_inscricao
-        self.vagas_disponiveis= numero_vagas
+        self.numero_vagas = numero_vagas
+        self.vagas_disponiveis = numero_vagas
         self.id_evento = id_evento

@@ -9,4 +9,5 @@ export interface Evento {
   nome_responsavel: string;
   cpf_responsavel: string;
   email_responsavel: string;
+  inscritos?: Array<number | { id: number }>;
 }

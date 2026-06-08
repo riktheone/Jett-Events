@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { EventoService } from '../../../core/services/evento.service';
 import { apiError } from '../../../core/services/auth.service';
 import { formatCpf, isCpfComplete, onlyCpfDigits } from '../../../core/utils/cpf.util';
+import { dateInputValue } from '../../../core/utils/date.util';
 import { Evento } from '../../../models/evento.model';
 
 @Component({
@@ -41,8 +42,8 @@ export class EventoForm implements OnInit {
 
   private preencher(ev: Evento): void {
     this.nome = ev.nome; this.descricao = ev.descricao ?? '';
-    this.dt_inicio = ev.dt_inicio; this.dt_fim = ev.dt_fim;
-    this.dt_limite_inscricao = ev.dt_limite_inscricao;
+    this.dt_inicio = dateInputValue(ev.dt_inicio); this.dt_fim = dateInputValue(ev.dt_fim);
+    this.dt_limite_inscricao = dateInputValue(ev.dt_limite_inscricao);
     this.numero_vagas = ev.numero_vagas;
     this.nome_responsavel = ev.nome_responsavel;
     this.cpf_responsavel = formatCpf(ev.cpf_responsavel);
@@ -57,7 +58,7 @@ export class EventoForm implements OnInit {
   }
 
   async salvar(): Promise<void> {
-    if (!this.nome || !this.dt_inicio || !this.dt_fim || !this.dt_limite_inscricao ||
+    if (!this.nome || !this.descricao || !this.dt_inicio || !this.dt_fim || !this.dt_limite_inscricao ||
         !this.numero_vagas || !this.nome_responsavel || !this.cpf_responsavel || !this.email_responsavel) {
       this.erro.set('Preencha todos os campos obrigatórios.'); return;
     }

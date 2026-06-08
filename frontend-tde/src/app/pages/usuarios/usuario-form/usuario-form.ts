@@ -56,7 +56,7 @@ export class UsuarioForm implements OnInit {
     try {
       const cpf = onlyCpfDigits(this.cpf);
       if (this.editando()) {
-        const senha = this.novaSenha ? await hashSenha(this.novaSenha) : await hashSenha('');
+        const senha = this.novaSenha ? await hashSenha(this.novaSenha) : 'sem_alteracao';
         const resp = await firstValueFrom(
           this.usuarioSvc.atualizar(this.id, { cpf, nome: this.nome, email: this.email, senha })
         );

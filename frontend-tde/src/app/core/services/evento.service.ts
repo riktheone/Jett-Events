@@ -9,6 +9,13 @@ export interface Programacao {
   minicursos: any[];
 }
 
+export interface InscricaoPayload {
+  cpf_participante: string;
+  nome_participante: string;
+  email_participante: string;
+  telefone_participante: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EventoService {
   private readonly http = inject(HttpClient);
@@ -16,6 +23,12 @@ export class EventoService {
 
   obterTodos(): Observable<Evento[]> {
     return this.http.get<Evento[]>(this.base);
+  }
+
+  obterPorPeriodo(dtInicio: string, dtFim: string): Observable<Evento[]> {
+    return this.http.get<Evento[]>(`${this.base}/periodo`, {
+      params: { dt_inicio: dtInicio, dt_fim: dtFim }
+    });
   }
 
   obterPorId(id: number): Observable<Evento> {
@@ -38,10 +51,10 @@ export class EventoService {
     return this.http.delete<{ msg: string }>(`${this.base}/${id}`);
   }
 
-  inscrever(idEvento: number, idUsuario: number): Observable<{ msg: string }> {
+  inscrever(idEvento: number, payload: InscricaoPayload): Observable<{ msg: string }> {
     return this.http.post<{ msg: string }>(`${environment.apiUrl}/inscricao/evento`, {
       id_evento: idEvento,
-      id_usuario_participante: idUsuario
+      ...payload
     });
   }
 

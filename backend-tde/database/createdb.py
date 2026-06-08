@@ -13,8 +13,8 @@ cursor = conn.cursor()
 cursor.execute("""
 CREATE TABLE usuarios (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  cpf VARCHAR(11) NOT NULL,
-  email VARCHAR(30) NOT NULL,
+  cpf VARCHAR(11) NOT NULL UNIQUE,
+  email VARCHAR(30) NOT NULL UNIQUE,
   nome VARCHAR(50) NOT NULL,
   usuario_admin BOOLEAN NOT NULL,
   hash_senha VARCHAR(20) NOT NULL
@@ -78,6 +78,10 @@ CREATE TABLE inscricao_evento (
   id_usuario INTEGER,
   id_evento INTEGER,
   dt_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  cpf_participante VARCHAR(11) NOT NULL,
+  nome_participante VARCHAR(50) NOT NULL,
+  email_participante VARCHAR(50) NOT NULL,
+  telefone_participante VARCHAR(20) NOT NULL,
   CONSTRAINT inscricao_evento_pk PRIMARY KEY (id_usuario, id_evento),
   FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
   FOREIGN KEY (id_evento) REFERENCES eventos(id)
@@ -90,9 +94,13 @@ CREATE TABLE inscricao_minicurso (
   id_usuario INTEGER,
   id_minicurso INTEGER,
   dt_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  cpf_participante VARCHAR(11) NOT NULL,
+  nome_participante VARCHAR(50) NOT NULL,
+  email_participante VARCHAR(50) NOT NULL,
+  telefone_participante VARCHAR(20) NOT NULL,
   CONSTRAINT inscricao_minicurso_pk PRIMARY KEY (id_usuario, id_minicurso),
   FOREIGN KEY (id_usuario) REFERENCES usuarios(id),
-  FOREIGN KEY (id_minicurso) REFERENCES minicurso(id)
+  FOREIGN KEY (id_minicurso) REFERENCES minicursos(id)
 );
 """)
 print('Tabela inscricao_minicurso criada com sucesso.')

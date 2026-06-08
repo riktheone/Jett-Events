@@ -1,6 +1,6 @@
 <div class="main-content page">
   <div class="page-top">
-    <p style="color:var(--texto-fraco);font-size:.88rem;">Admin</p>
+    <p style="color:var(--texto-fraco);font-size:.88rem;">Listagem</p>
     <h2>Inscritos</h2>
   </div>
 
@@ -18,8 +18,8 @@
           <div class="inscrito-row">
             <span class="inscrito-num">{{ $index + 1 }}</span>
             <div class="inscrito-info">
-              <strong>{{ ins.nome ?? ins }}</strong>
-              @if (ins.cpf) { <small>{{ ins.cpf }} · {{ ins.email }}</small> }
+              <strong>{{ nomeInscrito(ins) }}</strong>
+              @if (temDetalhesInscrito(ins)) { <small>{{ detalhesInscrito(ins) }}</small> }
             </div>
           </div>
         }
@@ -42,8 +42,8 @@
           <div class="inscrito-row">
             <span class="inscrito-num">{{ $index + 1 }}</span>
             <div class="inscrito-info">
-              <strong>{{ ins.nome ?? ins }}</strong>
-              @if (ins.cpf) { <small>{{ ins.cpf }} · {{ ins.email }}</small> }
+              <strong>{{ nomeInscrito(ins) }}</strong>
+              @if (temDetalhesInscrito(ins)) { <small>{{ detalhesInscrito(ins) }}</small> }
             </div>
           </div>
         }

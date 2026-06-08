@@ -39,7 +39,7 @@ export class Perfil {
     this.erro.set('');
     try {
       const u = this.auth.usuario()!;
-      const senha = await hashSenha(this.novaSenha || '');
+      const senha = this.novaSenha ? await hashSenha(this.novaSenha) : 'sem_alteracao';
       await firstValueFrom(
         this.usuarioSvc.atualizar(u.id, { cpf: u.cpf, nome: this.nome, email: this.email, senha })
       );

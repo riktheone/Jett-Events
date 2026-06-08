@@ -1,0 +1,17 @@
+@if (dialog.state(); as state) {
+  <div class="dialog-backdrop" role="presentation" (click)="close(false)">
+    <section class="dialog-panel" role="dialog" aria-modal="true" [attr.aria-label]="state.title" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <span class="dialog-tone" [class]="'dialog-tone dialog-tone-' + state.tone"></span>
+        <h2>{{ state.title }}</h2>
+      </div>
+      <p class="dialog-message">{{ state.message }}</p>
+      <div class="dialog-actions">
+        @if (state.showCancel) {
+          <button class="btn btn-ghost" type="button" (click)="close(false)">{{ state.cancelText }}</button>
+        }
+        <button class="btn btn-primary" type="button" (click)="close(true)">{{ state.confirmText }}</button>
+      </div>
+    </section>
+  </div>
+}

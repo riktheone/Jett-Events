@@ -151,6 +151,58 @@ body::before {
 .alert-success { background: rgba(76,175,130,.12); border: 1px solid rgba(76,175,130,.3); color: #6fcba0; }
 .alert-info    { background: rgba(90,138,224,.12); border: 1px solid rgba(90,138,224,.3); color: #80a8f0; }
 
+/* ---- Dialog ---- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5,5,8,.68);
+  backdrop-filter: blur(6px);
+}
+.dialog-panel {
+  width: min(440px, 100%);
+  background: var(--card);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 22px 70px rgba(0,0,0,.45);
+}
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.dialog-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  color: var(--texto);
+}
+.dialog-tone {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+  background: var(--info);
+}
+.dialog-tone-success { background: var(--sucesso); }
+.dialog-tone-error { background: var(--erro); }
+.dialog-tone-warning { background: var(--primaria); }
+.dialog-message {
+  color: var(--texto-fraco);
+  font-size: .94rem;
+  margin-bottom: 20px;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 /* ---- Badges ---- */
 .badge { display: inline-block; font-size: .72rem; padding: 2px 10px; border-radius: 20px; font-weight: 500; }
 .badge-admin  { background: rgba(155,109,224,.2); color: #c09af0; border: 1px solid rgba(155,109,224,.3); }

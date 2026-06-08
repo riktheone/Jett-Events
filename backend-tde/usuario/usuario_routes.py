@@ -1,6 +1,7 @@
 from usuario.usuario_controller import UsuarioBC
 from flask import Blueprint, jsonify, request
 from usuario.usuario import Usuario
+from util.cpf_util import limpar_cpf
 from util.jwt_util import jwtDecode
 
 usuarioRoutes = Blueprint("usuario", __name__)
@@ -80,7 +81,7 @@ def remover(id):
 def logar():
     try:
         if 'cpf' in request.json and 'senha' in request.json:
-            cpf = ''.join(filter(str.isdigit, str(request.json['cpf'])))
+            cpf = limpar_cpf(request.json['cpf'])
             senha = request.json['senha']
             print({'cpf': cpf, 'senha': senha})
             if cpf and senha:

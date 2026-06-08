@@ -6,6 +6,7 @@ import { PalestraService } from '../../core/services/palestra.service';
 import { EventoService } from '../../core/services/evento.service';
 import { Palestra } from '../../models/palestra.model';
 import { Evento } from '../../models/evento.model';
+import { DialogService } from '../../shared/dialog/dialog.service';
 
 @Component({
   selector: 'app-palestras',
@@ -16,6 +17,7 @@ export class Palestras implements OnInit {
   readonly auth = inject(AuthService);
   private readonly palestraSvc = inject(PalestraService);
   private readonly eventoSvc = inject(EventoService);
+  private readonly dialog = inject(DialogService);
 
   readonly lista = signal<Palestra[]>([]);
   readonly eventos = signal<Evento[]>([]);
@@ -36,11 +38,12 @@ export class Palestras implements OnInit {
   }
 
   async remover(p: Palestra): Promise<void> {
-    if (!confirm(`Remover a palestra "${p.nome}"?`)) return;
+    const confirmado = await this.dialog.confirm(`Remover a palestra "${p.nome}"?`);
+    if (!confirmado) return;
     try {
       const resp = await firstValueFrom(this.palestraSvc.remover(p.id));
-      alert(resp.msg || 'Palestra removida.');
+      await this.dialog.alert(resp.msg || 'Palestra removida.', 'Palestra removida', 'success');
       this.palestraSvc.obterTodos().subscribe(list => this.lista.set(list));
-    } catch (err) { alert(apiError(err)); }
+    } catch (err) { await this.dialog.alert(apiError(err), 'Erro ao remover', 'error'); }
   }
 }
