@@ -27,7 +27,6 @@ export class Login {
 
   async login(): Promise<void> {
     if (!this.cpf || !this.senha) { this.erro.set('Preencha CPF e senha.'); return; }
-    if (!isCpfComplete(this.cpf)) { this.erro.set('CPF deve conter 11 digitos.'); return; }
     this.carregando.set(true);
     this.erro.set('');
     try {

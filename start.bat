@@ -17,6 +17,11 @@ call ".venv\Scripts\activate.bat"
 python -m pip install --upgrade pip
 pip install -r "backend-tde\requirements.txt"
 
+echo [setup] Criando super usuario (CPF 1234)...
+pushd "backend-tde"
+python "database\seed_admin.py"
+popd
+
 REM ---------- Frontend (Angular / npm) ----------
 echo [setup] Instalando dependencias do frontend...
 pushd "frontend-tde"
